@@ -88,9 +88,14 @@ fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    // Span a player
+    span_player(&mut commands, &assets_server);
+    span_player(&mut commands, &assets_server);
+}
+
+fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
     let tank_body = assets_server.load("tank/body.gltf#Scene0");
     let tank_turrent = assets_server.load("tank/turret.gltf#Scene0");
+
     commands
         .spawn_bundle((
             Transform::identity(),
