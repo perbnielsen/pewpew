@@ -20,21 +20,20 @@ fn player_control_system(
     keyboard_input: Res<Input<KeyCode>>,
 ) {
     for (mut movement, player_controller) in players.iter_mut() {
+        movement.velocity = 0.0;
+        movement.delta_yaw = 0.0;
+
         if keyboard_input.pressed(player_controller.keycode_left) {
-            println!("Turn left");
-            movement.delta_yaw -= 1.0;
+            movement.delta_yaw += movement.rotation_speed;
         }
         if keyboard_input.pressed(player_controller.keycode_right) {
-            println!("Turn right");
-            movement.delta_yaw += 1.0;
+            movement.delta_yaw -= movement.rotation_speed;
         }
         if keyboard_input.pressed(player_controller.keycode_forward) {
-            println!("Turn forward");
-            movement.velocity += 1.0;
+            movement.velocity += movement.speed;
         }
         if keyboard_input.pressed(player_controller.keycode_reverse) {
-            println!("Turn reverse");
-            movement.velocity -= 1.0;
+            movement.velocity -= movement.speed;
         }
     }
 }
@@ -65,8 +64,21 @@ impl PlayerControllerConfiguration {
 
 #[derive(Component, Default)]
 struct Moving {
+    pub speed: f32,
+    pub rotation_speed: f32,
+
     pub velocity: f32,
     pub delta_yaw: f32,
+}
+
+impl Moving {
+    pub fn new(speed: f32, rotation_speed: f32) -> Self {
+        Self {
+            speed,
+            rotation_speed,
+            ..Default::default()
+        }
+    }
 }
 
 fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
@@ -84,7 +96,7 @@ fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
             Transform::identity(),
             GlobalTransform::identity(),
             PlayerControllerConfiguration::new(KeyCode::A, KeyCode::S, KeyCode::W, KeyCode::R),
-            Moving::default(),
+            Moving::new(5.0, 3.0),
         ))
         .with_children(|parent| {
             parent.spawn_scene(tank_body);
@@ -98,8 +110,8 @@ fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
 
 fn movement_update_system(mut moving_objects: Query<(&Moving, &mut Transform)>, time: Res<Time>) {
     for (movement, mut transform) in moving_objects.iter_mut() {
-        // TODO: rotate transform according to movement
         let forward_velocity = transform.forward() * movement.velocity * time.delta_seconds();
         transform.translation += forward_velocity;
+        transform.rotation *= Quat::from_rotation_y(movement.delta_yaw * time.delta_seconds());
     }
 }
