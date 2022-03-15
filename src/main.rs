@@ -69,41 +69,31 @@ struct Moving {
     pub delta_yaw: f32,
 }
 
-fn setup(
-    mut commands: Commands,
-    // mut meshes: ResMut<Assets<Mesh>>,
-    // mut materials: ResMut<Assets<StandardMaterial>>,
-    assets_server: Res<AssetServer>,
-) {
+fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
     commands.spawn_bundle(PerspectiveCameraBundle {
-        transform: Transform::from_xyz(10.0, 0.0, 0.0)
+        transform: Transform::from_xyz(10.0, 10.0, 0.0)
             .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
         ..Default::default()
     });
-    // Span a player
-    commands.spawn_bundle((
-        Transform::identity(),
-        GlobalTransform::identity(),
-        PlayerControllerConfiguration::new(KeyCode::A, KeyCode::S, KeyCode::W, KeyCode::R),
-        Moving::default(),
-    ));
 
-    // let transform = Transform::from_xyz(0.0, 0.0, 0.0);
-    let mesh = assets_server.load("tank/turret.gltf#Scene0");
-    commands.spawn_scene(mesh);
-    let mesh = assets_server.load("tank/body.gltf#Scene0");
-    commands.spawn_scene(mesh);
-    // commands.spawn_bundle(PbrBundle {
-    // mesh: meshes.add(Mesh::from(shape::Box::new(5.27, 2.79, 1.02))),
-    // mesh, //assets_server.load("tank/turret.gltf#Scene0"),
-    // transform,
-    // material: materials.add(StandardMaterial {
-    //     base_color: Color::INDIGO,
-    //     perceptual_roughness: 1.0,
-    //     ..Default::default()
-    // }),
-    // ..Default::default()
-    // });
+    // Span a player
+    let tank_body = assets_server.load("tank/body.gltf#Scene0");
+    let tank_turrent = assets_server.load("tank/turret.gltf#Scene0");
+    commands
+        .spawn_bundle((
+            Transform::identity(),
+            GlobalTransform::identity(),
+            PlayerControllerConfiguration::new(KeyCode::A, KeyCode::S, KeyCode::W, KeyCode::R),
+            Moving::default(),
+        ))
+        .with_children(|parent| {
+            parent.spawn_scene(tank_body);
+            parent
+                .spawn_bundle((Transform::identity(), GlobalTransform::identity()))
+                .with_children(|parent| {
+                    parent.spawn_scene(tank_turrent);
+                });
+        });
 }
 
 fn movement_update_system(mut moving_objects: Query<(&Moving, &mut Transform)>, time: Res<Time>) {
