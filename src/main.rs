@@ -16,10 +16,12 @@ fn main() {
 // }
 
 fn player_control_system(
-    mut players: Query<(&mut Moving, &PlayerControllerConfiguration)>,
+    mut players: Query<(&mut Moving, &PlayerControllerConfiguration, &Transform)>,
     keyboard_input: Res<Input<KeyCode>>,
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    for (mut movement, player_controller) in players.iter_mut() {
+    for (mut movement, player_controller, transform) in players.iter_mut() {
         movement.velocity = 0.0;
         movement.delta_yaw = 0.0;
 
@@ -35,6 +37,24 @@ fn player_control_system(
         if keyboard_input.pressed(player_controller.keycode_reverse) {
             movement.velocity -= movement.speed;
         }
+        if keyboard_input.just_pressed(player_controller.keycode_fire) {
+            println!("pew pew!");
+            let moving = Moving {
+                velocity: 10.0,
+                ..Default::default()
+            };
+            commands
+                .spawn_bundle(PbrBundle {
+                    transform: transform.clone(),
+                    mesh: meshes.add(Mesh::from(shape::Icosphere {
+                        radius: 0.2,
+                        subdivisions: 3,
+                    })),
+                    ..Default::default()
+                })
+                .insert(Projectile::default())
+                .insert(moving);
+        }
     }
 }
 
@@ -44,6 +64,7 @@ struct PlayerControllerConfiguration {
     pub keycode_right: KeyCode,
     pub keycode_forward: KeyCode,
     pub keycode_reverse: KeyCode,
+    pub keycode_fire: KeyCode,
 }
 
 impl PlayerControllerConfiguration {
@@ -52,12 +73,14 @@ impl PlayerControllerConfiguration {
         keycode_right: KeyCode,
         keycode_forward: KeyCode,
         keycode_reverse: KeyCode,
+        keycode_fire: KeyCode,
     ) -> Self {
         Self {
             keycode_left,
             keycode_right,
             keycode_forward,
             keycode_reverse,
+            keycode_fire,
         }
     }
 }
@@ -81,6 +104,9 @@ impl Moving {
     }
 }
 
+#[derive(Component, Default)]
+struct Projectile {}
+
 fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
     commands.spawn_bundle(PerspectiveCameraBundle {
         transform: Transform::from_xyz(10.0, 10.0, 0.0)
@@ -88,7 +114,6 @@ fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    span_player(&mut commands, &assets_server);
     span_player(&mut commands, &assets_server);
 }
 
@@ -100,7 +125,13 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
         .spawn_bundle((
             Transform::identity(),
             GlobalTransform::identity(),
-            PlayerControllerConfiguration::new(KeyCode::A, KeyCode::S, KeyCode::W, KeyCode::R),
+            PlayerControllerConfiguration::new(
+                KeyCode::A,
+                KeyCode::S,
+                KeyCode::W,
+                KeyCode::R,
+                KeyCode::Space,
+            ),
             Moving::new(5.0, 3.0),
         ))
         .with_children(|parent| {
