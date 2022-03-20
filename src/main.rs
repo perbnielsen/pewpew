@@ -39,13 +39,10 @@ fn player_control_system(
         }
         if keyboard_input.just_pressed(player_controller.keycode_fire) {
             println!("pew pew!");
-            let moving = Moving {
-                velocity: 10.0,
-                ..Default::default()
-            };
+            let transform = transform.with_translation(*transform * Vec3::new(0.0, 1.517, -3.51));
             commands
                 .spawn_bundle(PbrBundle {
-                    transform: transform.clone(),
+                    transform,
                     mesh: meshes.add(Mesh::from(shape::Icosphere {
                         radius: 0.2,
                         subdivisions: 3,
@@ -53,7 +50,10 @@ fn player_control_system(
                     ..Default::default()
                 })
                 .insert(Projectile::default())
-                .insert(moving);
+                .insert(Moving {
+                    velocity: 20.0,
+                    ..Default::default()
+                });
         }
     }
 }
