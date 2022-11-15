@@ -6,7 +6,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
         // .add_system(fps_system)
-        .add_system(exit_on_esc_system)
+        .add_system(close_on_esc)
         .add_system(player_control_system)
         .add_system(movement_update_system)
         .add_system(auto_despawn_system)
