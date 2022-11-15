@@ -29,7 +29,7 @@ fn main() {
 //             if let Ok((_, name)) = transform_query.get(*child) {
 //                 println!("    {}", name.as_str());
 //             } else {
-//                 println!("    Unamed child");
+//                 println!("    Unnamed child");
 //             }
 //         }
 //     }
@@ -166,7 +166,7 @@ fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
 
 fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
     let tank_body = assets_server.load("tank/body.gltf#Scene0");
-    let tank_turrent = assets_server.load("tank/turret.gltf#Scene0");
+    let tank_turret = assets_server.load("tank/turret.gltf#Scene0");
 
     commands
         .spawn_bundle((
@@ -186,7 +186,7 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
             parent
                 .spawn_bundle((Transform::identity(), GlobalTransform::identity()))
                 .with_children(|parent| {
-                    parent.spawn_scene(tank_turrent);
+                    parent.spawn_scene(tank_turret);
                 });
         });
 }
