@@ -1,5 +1,5 @@
 use bevy::{prelude::*, window::close_on_esc};
-use bevy_inspector_egui::WorldInspectorPlugin;
+use bevy_inspector_egui::{egui, Inspectable, RegisterInspectable, WorldInspectorPlugin};
 
 fn main() {
     App::new()
@@ -12,6 +12,8 @@ fn main() {
         .add_system(auto_despawn_system)
         .add_startup_system(setup)
         // .add_system(print_children_names)
+        .register_inspectable::<Moving>()
+        .register_inspectable::<PlayerControllerConfiguration>()
         .run();
 }
 
@@ -113,6 +115,40 @@ impl PlayerControllerConfiguration {
     }
 }
 
+impl Inspectable for PlayerControllerConfiguration {
+    type Attributes = ();
+
+    fn ui(
+        &mut self,
+        ui: &mut bevy_inspector_egui::egui::Ui,
+        _options: Self::Attributes,
+        _context: &mut bevy_inspector_egui::Context,
+    ) -> bool {
+        egui::Grid::new("pos_size").show(ui, |ui| {
+            ui.label("Forward");
+            ui.label(format!("{:?}", self.keycode_forward));
+            ui.end_row();
+
+            ui.label("Backwards:");
+            ui.label(format!("{:?}", self.keycode_reverse));
+            ui.end_row();
+
+            ui.label("Right:");
+            ui.label(format!("{:?}", self.keycode_right));
+            ui.end_row();
+
+            ui.label("Left:");
+            ui.label(format!("{:?}", self.keycode_left));
+            ui.end_row();
+
+            ui.label("Fire:");
+            ui.label(format!("{:?}", self.keycode_fire));
+        });
+
+        false // We do not modify the data
+    }
+}
+
 #[derive(Debug, Component)]
 struct AutoDespawn {
     pub entity: Entity,
@@ -132,7 +168,7 @@ fn auto_despawn_system(
     }
 }
 
-#[derive(Component, Default)]
+#[derive(Component, Default, Inspectable)]
 struct Moving {
     pub speed: f32,
     pub rotation_speed: f32,
