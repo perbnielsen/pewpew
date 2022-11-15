@@ -1,4 +1,4 @@
-use bevy::{input::system::exit_on_esc_system, prelude::*};
+use bevy::{prelude::*, window::close_on_esc};
 use bevy_inspector_egui::WorldInspectorPlugin;
 
 fn main() {
@@ -64,7 +64,7 @@ fn player_control_system(
         }
         if keyboard_input.just_pressed(player_controller.keycode_fire) {
             let transform = transform.with_translation(*transform * Vec3::new(0.0, 1.52, -3.51));
-            let mut bullet = commands.spawn_bundle(PbrBundle {
+            let mut bullet = commands.spawn(PbrBundle {
                 transform,
                 mesh: meshes.add(Mesh::from(shape::Icosphere {
                     radius: 0.2,
@@ -155,7 +155,7 @@ impl Moving {
 struct Projectile {}
 
 fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
-    commands.spawn_bundle(PerspectiveCameraBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(30.0, 30.0, 0.0)
             .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
         ..Default::default()
@@ -169,9 +169,9 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
     let tank_turret = assets_server.load("tank/turret.gltf#Scene0");
 
     commands
-        .spawn_bundle((
-            Transform::identity(),
-            GlobalTransform::identity(),
+        .spawn((
+            Transform::IDENTITY,
+            GlobalTransform::IDENTITY,
             PlayerControllerConfiguration::new(
                 KeyCode::A,
                 KeyCode::S,
@@ -182,11 +182,17 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
             Moving::new(10.0, 3.0),
         ))
         .with_children(|parent| {
-            parent.spawn_scene(tank_body);
+            parent.spawn(SceneBundle {
+                scene: tank_body,
+                ..Default::default()
+            });
             parent
-                .spawn_bundle((Transform::identity(), GlobalTransform::identity()))
+                .spawn((Transform::IDENTITY, GlobalTransform::IDENTITY))
                 .with_children(|parent| {
-                    parent.spawn_scene(tank_turret);
+                    parent.spawn(SceneBundle {
+                        scene: tank_turret,
+                        ..Default::default()
+                    });
                 });
         });
 }
