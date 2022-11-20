@@ -5,37 +5,15 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
-        // .add_system(fps_system)
         .add_system(close_on_esc)
         .add_system(player_control_system)
         .add_system(movement_update_system)
         .add_system(auto_despawn_system)
         .add_startup_system(setup)
-        // .add_system(print_children_names)
         .register_inspectable::<Moving>()
         .register_inspectable::<PlayerControllerConfiguration>()
         .run();
 }
-
-// fn fps_system(time: Res<Time>) {
-//     println!("Fps: {}", 1.0f32 / time.delta_seconds());
-// }
-
-// fn print_children_names(
-//     transforms: Query<(&Transform, &Children, &Name)>,
-//     transform_query: Query<(&Transform, &Name)>,
-// ) {
-//     for (_, children, name) in transforms.iter() {
-//         println!("{}:", name.as_str());
-//         for child in children.iter() {
-//             if let Ok((_, name)) = transform_query.get(*child) {
-//                 println!("    {}", name.as_str());
-//             } else {
-//                 println!("    Unnamed child");
-//             }
-//         }
-//     }
-// }
 
 fn player_control_system(
     mut players: Query<(
