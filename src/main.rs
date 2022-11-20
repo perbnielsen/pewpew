@@ -206,6 +206,7 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
 
     commands
         .spawn((
+            Name::new("Tank"),
             SceneBundle {
                 scene: tank_body,
                 ..Default::default()
@@ -220,10 +221,13 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
             Moving::new(10.0, 3.0),
         ))
         .with_children(|parent| {
-            parent.spawn(SceneBundle {
+            parent.spawn((
+                Name::new("Turret"),
+                SceneBundle {
                 scene: tank_turret,
                 ..Default::default()
-            });
+                },
+            ));
         });
 }
 
