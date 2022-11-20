@@ -213,9 +213,9 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
             },
             PlayerControllerConfiguration::new(
                 KeyCode::A,
-                KeyCode::S,
+                KeyCode::D,
                 KeyCode::W,
-                KeyCode::R,
+                KeyCode::S,
                 KeyCode::Space,
             ),
             Moving::new(10.0, 3.0),
@@ -224,8 +224,8 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
             parent.spawn((
                 Name::new("Turret"),
                 SceneBundle {
-                scene: tank_turret,
-                ..Default::default()
+                    scene: tank_turret,
+                    ..Default::default()
                 },
             ));
         });
