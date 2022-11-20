@@ -206,8 +206,10 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
 
     commands
         .spawn((
-            Transform::IDENTITY,
-            GlobalTransform::IDENTITY,
+            SceneBundle {
+                scene: tank_body,
+                ..Default::default()
+            },
             PlayerControllerConfiguration::new(
                 KeyCode::A,
                 KeyCode::S,
@@ -219,17 +221,9 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
         ))
         .with_children(|parent| {
             parent.spawn(SceneBundle {
-                scene: tank_body,
+                scene: tank_turret,
                 ..Default::default()
             });
-            parent
-                .spawn((Transform::IDENTITY, GlobalTransform::IDENTITY))
-                .with_children(|parent| {
-                    parent.spawn(SceneBundle {
-                        scene: tank_turret,
-                        ..Default::default()
-                    });
-                });
         });
 }
 
