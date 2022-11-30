@@ -3,6 +3,7 @@ use crate::{
     moving::Moving, player_controller_configuration::PlayerControllerConfiguration, Projectile,
 };
 use bevy::prelude::*;
+use bevy_rapier3d::prelude::*;
 
 pub fn player_control_system(
     mut players: Query<(
@@ -32,27 +33,37 @@ pub fn player_control_system(
             movement.velocity -= movement.speed;
         }
         if keyboard_input.just_pressed(player_controller.keycode_fire) {
-            let transform = transform.with_translation(*transform * Vec3::new(0.0, 1.52, -3.51));
-            let mut bullet = commands.spawn(PbrBundle {
-                transform,
-                mesh: meshes.add(Mesh::from(shape::Icosphere {
-                    radius: 0.2,
-                    subdivisions: 3,
-                })),
-                ..Default::default()
-            });
-            bullet.insert(Projectile::default()).insert(Moving {
-                velocity: 40.0,
-                ..Default::default()
-            });
-            let id = bullet.id();
-            let auto_despawner = AutoDespawn {
-                entity: id,
-                time_to_live: 1.0,
-            };
-            bullet.insert(auto_despawner);
+            fire_bullet(transform, &mut commands, &mut meshes);
         }
     }
+}
+
+fn fire_bullet(transform: &Transform, commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>) {
+    const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 1.52, -3.51);
+    let transform = transform.with_translation(*transform * BULLET_FIRE_OFFSET);
+    let mut bullet = commands.spawn_empty();
+    let id = bullet.id();
+    bullet.insert((
+        PbrBundle {
+            transform,
+            mesh: meshes.add(Mesh::from(shape::Icosphere {
+                radius: 0.2,
+                subdivisions: 3,
+            })),
+            ..Default::default()
+        },
+        Projectile::default(),
+        Moving {
+            velocity: 20.0,
+            ..Default::default()
+        },
+        RigidBody::Dynamic,
+        Collider::ball(0.5),
+        AutoDespawn {
+            entity: id,
+            time_to_live: 1.0,
+        },
+    ));
 }
 
 pub fn auto_despawn_system(
