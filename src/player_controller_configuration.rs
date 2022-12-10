@@ -8,6 +8,7 @@ pub struct PlayerControllerConfiguration {
     pub keycode_forward: KeyCode,
     pub keycode_reverse: KeyCode,
     pub keycode_fire: KeyCode,
+    pub keycode_lay_mine: KeyCode,
 }
 
 impl PlayerControllerConfiguration {
@@ -17,6 +18,7 @@ impl PlayerControllerConfiguration {
         keycode_forward: KeyCode,
         keycode_reverse: KeyCode,
         keycode_fire: KeyCode,
+        keycode_lay_mine: KeyCode,
     ) -> Self {
         Self {
             keycode_left,
@@ -24,6 +26,7 @@ impl PlayerControllerConfiguration {
             keycode_forward,
             keycode_reverse,
             keycode_fire,
+            keycode_lay_mine,
         }
     }
 }

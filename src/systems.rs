@@ -35,10 +35,26 @@ pub fn player_control_system(
         if keyboard_input.just_pressed(player_controller.keycode_fire) {
             fire_bullet(transform, &mut commands, &mut meshes);
         }
+        if keyboard_input.just_pressed(player_controller.keycode_lay_mine) {
+            lay_mine(&mut commands, transform, &mut meshes);
+        }
     }
 }
 
-fn fire_bullet(transform: &Transform, commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>) {
+fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
+    const MINE_RADIUS: f32 = 1.0;
+    let mut mine = commands.spawn_empty();
+    mine.insert(Collider::ball(MINE_RADIUS));
+    mine.insert(PbrBundle {
+        transform: transform.clone(),
+        mesh: meshes.add(Mesh::from(shape::Icosphere {
+            radius: MINE_RADIUS,
+            subdivisions: 3,
+        })),
+        ..Default::default()
+    });
+}
+
     const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 1.52, -3.51);
     let transform = transform.with_translation(*transform * BULLET_FIRE_OFFSET);
     let mut bullet = commands.spawn_empty();

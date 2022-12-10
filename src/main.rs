@@ -29,7 +29,6 @@ fn main() {
         .add_system(player_control_system)
         .add_system(movement_update_system)
         .add_system(auto_despawn_system)
-        .add_startup_system(setup)
         .register_inspectable::<Moving>()
         .register_inspectable::<PlayerControllerConfiguration>()
         .run();
@@ -76,6 +75,7 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
                 KeyCode::W,
                 KeyCode::S,
                 KeyCode::Space,
+                KeyCode::M,
             ),
             Moving::new(10.0, 3.0),
             RigidBody::Dynamic,
