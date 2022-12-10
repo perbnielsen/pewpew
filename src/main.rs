@@ -41,6 +41,7 @@ pub struct Projectile {}
 fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
     spawn_camera(&mut commands);
     span_player(&mut commands, &assets_server);
+    spawn_floor(&mut commands);
 }
 
 fn spawn_camera(commands: &mut Commands) {
@@ -49,6 +50,13 @@ fn spawn_camera(commands: &mut Commands) {
             .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
         ..Default::default()
     });
+}
+
+fn spawn_floor(commands: &mut Commands) {
+    commands.spawn((
+        Collider::cuboid(100.0, 0.1, 100.0),
+        TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)),
+    ));
 }
 
 fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
