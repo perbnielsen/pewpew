@@ -5,6 +5,7 @@ mod systems;
 
 use bevy::{prelude::*, window::close_on_esc};
 use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
+use bevy_rapier3d::prelude::*;
 use moving::Moving;
 use player_controller_configuration::PlayerControllerConfiguration;
 use systems::{auto_despawn_system, movement_update_system, player_control_system};
@@ -21,6 +22,9 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugin(RapierDebugRenderPlugin::default())
+        .add_startup_system(setup)
         .add_system(close_on_esc)
         .add_system(player_control_system)
         .add_system(movement_update_system)
