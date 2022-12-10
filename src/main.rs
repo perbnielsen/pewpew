@@ -78,6 +78,10 @@ fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
                 KeyCode::Space,
             ),
             Moving::new(10.0, 3.0),
+            RigidBody::Dynamic,
+            Velocity {
+                ..Default::default()
+            },
         ))
         .with_children(|parent| {
             parent.spawn((
