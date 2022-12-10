@@ -33,7 +33,7 @@ pub fn player_control_system(
             movement.velocity -= movement.speed;
         }
         if keyboard_input.just_pressed(player_controller.keycode_fire) {
-            fire_bullet(transform, &mut commands, &mut meshes);
+            fire_bullet(&mut commands, transform, &mut meshes);
         }
         if keyboard_input.just_pressed(player_controller.keycode_lay_mine) {
             lay_mine(&mut commands, transform, &mut meshes);
@@ -55,7 +55,10 @@ fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<
     });
 }
 
+fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
     const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 1.52, -3.51);
+    const BULLET_RADIUS: f32 = 0.2;
+
     let transform = transform.with_translation(*transform * BULLET_FIRE_OFFSET);
     let mut bullet = commands.spawn_empty();
     let id = bullet.id();
@@ -63,7 +66,7 @@ fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<
         PbrBundle {
             transform,
             mesh: meshes.add(Mesh::from(shape::Icosphere {
-                radius: 0.2,
+                radius: BULLET_RADIUS,
                 subdivisions: 3,
             })),
             ..Default::default()
@@ -74,7 +77,7 @@ fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<
             ..Default::default()
         },
         RigidBody::Dynamic,
-        Collider::ball(0.5),
+        Collider::ball(BULLET_RADIUS),
         AutoDespawn {
             entity: id,
             time_to_live: 1.0,
