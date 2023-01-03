@@ -74,17 +74,15 @@ fn spawn_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
             },
             PlayerControllerConfiguration::new(
                 KeyCode::A,
-                KeyCode::D,
-                KeyCode::W,
                 KeyCode::S,
+                KeyCode::W,
+                KeyCode::R,
                 KeyCode::Space,
                 KeyCode::M,
             ),
             Moving::new(10.0, 3.0),
-            RigidBody::Dynamic,
-            Velocity {
-                ..Default::default()
-            },
+            RigidBody::KinematicVelocityBased,
+            Velocity::default(),
         ))
         .with_children(|parent| {
             parent.spawn((
