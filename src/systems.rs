@@ -56,15 +56,16 @@ fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<
 }
 
 fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
-    const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 1.52, -3.51);
+    const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 1.5, -3.5);
     const BULLET_RADIUS: f32 = 0.2;
+    const BULLET_LIFETIME: f32 = 2.0;
+    const BULLET_VELOCITY: f32 = 20.0;
 
-    let transform = transform.with_translation(*transform * BULLET_FIRE_OFFSET);
     let mut bullet = commands.spawn_empty();
     let id = bullet.id();
     bullet.insert((
         PbrBundle {
-            transform,
+            transform: transform.with_translation(*transform * BULLET_FIRE_OFFSET),
             mesh: meshes.add(Mesh::from(shape::Icosphere {
                 radius: BULLET_RADIUS,
                 subdivisions: 3,
@@ -72,15 +73,12 @@ fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResM
             ..Default::default()
         },
         Projectile::default(),
-        Moving {
-            velocity: 20.0,
-            ..Default::default()
-        },
-        RigidBody::Dynamic,
+        RigidBody::KinematicVelocityBased,
+        Velocity::linear(transform.forward() * BULLET_VELOCITY),
         Collider::ball(BULLET_RADIUS),
         AutoDespawn {
             entity: id,
-            time_to_live: 1.0,
+            time_to_live: BULLET_LIFETIME,
         },
     ));
 }
