@@ -11,7 +11,10 @@ use player_controller_configuration::PlayerControllerConfiguration;
 use systems::{auto_despawn_system, movement_update_system, player_control_system};
 
 // [ ] Mines
-// [ ] Lay mines
+//   [X] Lay mines
+//   [ ] Mines activate after fixed period
+//   [ ] Mines explode after fixed period
+//   [ ] Mines explode on proximity to vehicle
 // [ ] AI
 // [ ] UI
 // [ ] Levels loading
