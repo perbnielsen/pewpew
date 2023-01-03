@@ -42,7 +42,7 @@ pub struct Projectile {}
 
 fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
     spawn_camera(&mut commands);
-    span_player(&mut commands, &assets_server);
+    spawn_player(&mut commands, &assets_server);
     spawn_floor(&mut commands);
 }
 
@@ -61,7 +61,7 @@ fn spawn_floor(commands: &mut Commands) {
     ));
 }
 
-fn span_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
+fn spawn_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
     let tank_body = assets_server.load("tank/body.gltf#Scene0");
     let tank_turret = assets_server.load("tank/turret.gltf#Scene0");
 
