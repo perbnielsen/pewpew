@@ -1,14 +1,10 @@
-mod auto_despawn;
-mod moving;
-mod player_controller_configuration;
 mod systems;
 
 use bevy::{prelude::*, window::close_on_esc};
 use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
 use bevy_rapier3d::prelude::*;
-use moving::Moving;
-use player_controller_configuration::PlayerControllerConfiguration;
-use systems::{auto_despawn_system, movement_update_system, player_control_system};
+
+use systems::*;
 
 // [ ] Mines
 //   [X] Lay mines
