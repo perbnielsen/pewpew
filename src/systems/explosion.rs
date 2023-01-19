@@ -4,6 +4,7 @@ use bevy_rapier3d::prelude::*;
 #[derive(Bundle)]
 pub struct ExplosionBundle {
     transform: Transform,
+    name: Name,
     global_transform: GlobalTransform,
     explosion: Explosion,
     collider: Collider,
@@ -19,6 +20,7 @@ impl ExplosionBundle {
             global_transform: GlobalTransform::default(),
             explosion: Explosion { entity },
             collider: Collider::ball(0.0),
+            name: Name::new("Explosion"),
         }
     }
 }

@@ -109,11 +109,11 @@ impl Inspectable for PlayerControllerConfiguration {
 fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
     const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 1.5, -3.5);
     const BULLET_RADIUS: f32 = 0.2;
-    const BULLET_LIFETIME: f32 = 2.0;
+    const BULLET_LIFETIME: f32 = 1.0;
     const BULLET_VELOCITY: f32 = 20.0;
 
     let mut bullet = commands.spawn_empty();
-    let id = bullet.id();
+    let entity_id = bullet.id();
     bullet.insert((
         PbrBundle {
             transform: transform.with_translation(*transform * BULLET_FIRE_OFFSET),
@@ -128,7 +128,7 @@ fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResM
         Velocity::linear(transform.forward() * BULLET_VELOCITY),
         Collider::ball(BULLET_RADIUS),
         AutoDespawn {
-            entity: id,
+            entity: entity_id,
             time_to_live: BULLET_LIFETIME,
         },
     ));
@@ -136,6 +136,7 @@ fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResM
 
 fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
     const MINE_RADIUS: f32 = 1.0;
+
     let mut mine = commands.spawn_empty();
     mine.insert(Collider::ball(MINE_RADIUS));
     mine.insert(PbrBundle {
