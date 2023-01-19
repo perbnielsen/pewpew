@@ -28,6 +28,7 @@ fn main() {
         .add_system(player_control_system)
         .add_system(movement_update_system)
         .add_system(auto_despawn_system)
+        .add_system(explosion_system)
         .register_inspectable::<Moving>()
         .register_inspectable::<PlayerControllerConfiguration>()
         .run();
