@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 
-use bevy_inspector_egui::Inspectable;
-
 pub fn movement_update_system(
     mut moving_objects: Query<(&Moving, &mut Transform)>,
     time: Res<Time>,
@@ -13,7 +11,7 @@ pub fn movement_update_system(
     }
 }
 
-#[derive(Component, Default, Inspectable)]
+#[derive(Component, Default, Reflect)]
 pub struct Moving {
     pub speed: f32,
     pub rotation_speed: f32,

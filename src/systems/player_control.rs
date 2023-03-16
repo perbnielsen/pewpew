@@ -1,8 +1,8 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::{egui, Inspectable};
+use bevy_inspector_egui::egui;
 use bevy_rapier3d::prelude::*;
 
-use crate::{systems::AutoDespawn, Projectile};
+use crate::{systems::AutoDespawn, MineFactory, Projectile};
 
 use super::movement_update::Moving;
 
@@ -72,39 +72,39 @@ impl PlayerControllerConfiguration {
     }
 }
 
-impl Inspectable for PlayerControllerConfiguration {
-    type Attributes = ();
+// impl Reflect for PlayerControllerConfiguration {
+//     type Attributes = ();
 
-    fn ui(
-        &mut self,
-        ui: &mut bevy_inspector_egui::egui::Ui,
-        _options: Self::Attributes,
-        _context: &mut bevy_inspector_egui::Context,
-    ) -> bool {
-        egui::Grid::new("pos_size").show(ui, |ui| {
-            ui.label("Forward");
-            ui.label(format!("{:?}", self.keycode_forward));
-            ui.end_row();
+//     fn ui(
+//         &mut self,
+//         ui: &mut bevy_inspector_egui::egui::Ui,
+//         _options: Self::Attributes,
+//         _context: &mut bevy_inspector_egui::Context,
+//     ) -> bool {
+//         egui::Grid::new("pos_size").show(ui, |ui| {
+//             ui.label("Forward");
+//             ui.label(format!("{:?}", self.keycode_forward));
+//             ui.end_row();
 
-            ui.label("Backwards:");
-            ui.label(format!("{:?}", self.keycode_reverse));
-            ui.end_row();
+//             ui.label("Backwards:");
+//             ui.label(format!("{:?}", self.keycode_reverse));
+//             ui.end_row();
 
-            ui.label("Right:");
-            ui.label(format!("{:?}", self.keycode_right));
-            ui.end_row();
+//             ui.label("Right:");
+//             ui.label(format!("{:?}", self.keycode_right));
+//             ui.end_row();
 
-            ui.label("Left:");
-            ui.label(format!("{:?}", self.keycode_left));
-            ui.end_row();
+//             ui.label("Left:");
+//             ui.label(format!("{:?}", self.keycode_left));
+//             ui.end_row();
 
-            ui.label("Fire:");
-            ui.label(format!("{:?}", self.keycode_fire));
-        });
+//             ui.label("Fire:");
+//             ui.label(format!("{:?}", self.keycode_fire));
+//         });
 
-        false // We do not modify the data
-    }
-}
+//         false // We do not modify the data
+//     }
+// }
 
 fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
     const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 1.5, -3.5);
@@ -117,10 +117,13 @@ fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResM
     bullet.insert((
         PbrBundle {
             transform: transform.with_translation(*transform * BULLET_FIRE_OFFSET),
-            mesh: meshes.add(Mesh::from(shape::Icosphere {
-                radius: BULLET_RADIUS,
-                subdivisions: 3,
-            })),
+            mesh: meshes.add(
+                Mesh::try_from(shape::Icosphere {
+                    radius: BULLET_RADIUS,
+                    subdivisions: 3,
+                })
+                .unwrap(),
+            ),
             ..Default::default()
         },
         Projectile::default(),
@@ -135,16 +138,21 @@ fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResM
 }
 
 fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
-    const MINE_RADIUS: f32 = 1.0;
-
+    // let mine = mine_factory.create_mine(transform.translation);
+    // commands.spawn(mine);
     let mut mine = commands.spawn_empty();
+
+    const MINE_RADIUS: f32 = 1.0;
     mine.insert(Collider::ball(MINE_RADIUS));
     mine.insert(PbrBundle {
         transform: *transform,
-        mesh: meshes.add(Mesh::from(shape::Icosphere {
-            radius: MINE_RADIUS,
-            subdivisions: 3,
-        })),
+        mesh: meshes.add(
+            Mesh::try_from(shape::Icosphere {
+                radius: MINE_RADIUS,
+                subdivisions: 3,
+            })
+            .unwrap(),
+        ),
         ..Default::default()
     });
 }
