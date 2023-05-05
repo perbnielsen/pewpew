@@ -26,6 +26,18 @@ enum MineState {
     Armed,
 }
 
+pub struct LayMineEvent {
+    transform: Transform,
+}
+
+impl LayMineEvent {
+    pub(crate) fn new(transform: &Transform) -> Self {
+        Self {
+            transform: transform.clone(),
+        }
+    }
+}
+
 impl Mine {
     fn new(time: Time) -> Self {
         Self {
@@ -57,7 +69,31 @@ impl Mine {
     // }
 }
 
-pub fn mine_system(mut commands: Commands, mut mines: Query<(&mut Mine)>, time: Res<Time>) {
+pub fn mine_laying_system(
+    mut commands: Commands,
+    mut lay_mine_event_reader: EventReader<LayMineEvent>,
+    mut meshes: ResMut<Assets<Mesh>>,
+) {
+    for event in lay_mine_event_reader.iter() {
+        let mut mine = commands.spawn_empty();
+
+        const MINE_RADIUS: f32 = 1.0;
+        mine.insert(Collider::ball(MINE_RADIUS));
+        mine.insert(PbrBundle {
+            transform: event.transform,
+            mesh: meshes.add(
+                Mesh::try_from(shape::Icosphere {
+                    radius: MINE_RADIUS,
+                    subdivisions: 3,
+                })
+                .unwrap(),
+            ),
+            ..Default::default()
+        });
+    }
+}
+
+pub fn mine_system(mut commands: Commands, mut mines: Query<&mut Mine>, time: Res<Time>) {
     for mut mine in mines.iter_mut() {
         if mine.state == MineState::Arming && time.elapsed() > mine.creation + MINE_ARMING_DELAY {
             mine.state = MineState::Armed;

@@ -1,10 +1,10 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::egui;
+// use bevy_inspector_egui::egui;
 use bevy_rapier3d::prelude::*;
 
-use crate::{systems::AutoDespawn, MineFactory, Projectile};
+use crate::{systems::AutoDespawn, Projectile};
 
-use super::movement_update::Moving;
+use super::{mine::LayMineEvent, movement_update::Moving};
 
 pub fn player_control_system(
     mut players: Query<(
@@ -16,6 +16,7 @@ pub fn player_control_system(
     keyboard_input: Res<Input<KeyCode>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut lay_mine_event_writer: EventWriter<LayMineEvent>,
 ) {
     for (mut movement, player_controller, transform, _children) in players.iter_mut() {
         movement.velocity = 0.0;
@@ -37,7 +38,8 @@ pub fn player_control_system(
             fire_bullet(&mut commands, transform, &mut meshes);
         }
         if keyboard_input.just_pressed(player_controller.keycode_lay_mine) {
-            lay_mine(&mut commands, transform, &mut meshes);
+            lay_mine_event_writer.send(LayMineEvent::new(transform));
+            // lay_mine(&mut commands, transform, &mut meshes);
         }
     }
 }
@@ -137,22 +139,20 @@ fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResM
     ));
 }
 
-fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
-    // let mine = mine_factory.create_mine(transform.translation);
-    // commands.spawn(mine);
-    let mut mine = commands.spawn_empty();
+// fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
+//     let mut mine = commands.spawn_empty();
 
-    const MINE_RADIUS: f32 = 1.0;
-    mine.insert(Collider::ball(MINE_RADIUS));
-    mine.insert(PbrBundle {
-        transform: *transform,
-        mesh: meshes.add(
-            Mesh::try_from(shape::Icosphere {
-                radius: MINE_RADIUS,
-                subdivisions: 3,
-            })
-            .unwrap(),
-        ),
-        ..Default::default()
-    });
-}
+//     const MINE_RADIUS: f32 = 1.0;
+//     mine.insert(Collider::ball(MINE_RADIUS));
+//     mine.insert(PbrBundle {
+//         transform: *transform,
+//         mesh: meshes.add(
+//             Mesh::try_from(shape::Icosphere {
+//                 radius: MINE_RADIUS,
+//                 subdivisions: 3,
+//             })
+//             .unwrap(),
+//         ),
+//         ..Default::default()
+//     });
+// }

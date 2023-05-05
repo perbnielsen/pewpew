@@ -1,61 +1,42 @@
 mod systems;
+use systems::*;
 
 use bevy::{prelude::*, window::close_on_esc};
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+// use bevy_inspector_egui::quick::WorldInspectorPlugin;
 // use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
 use bevy_rapier3d::prelude::*;
 
-use systems::*;
-
 // [ ] Mines
-//   [X] Lay mines
+//   [*] Lay mines using event
 //   [ ] Mines activate after fixed period
 //   [ ] Mines explode after fixed period
 //   [ ] Mines explode on proximity to vehicle
 // [ ] AI
 // [ ] UI
-// [ ] Levels loading
+// [ ] Level loading
 // [ ] Death
 // [ ] Collision detection
 
 fn main() {
     App::new()
+        .add_event::<LayMineEvent>()
         .add_plugins(DefaultPlugins)
         // .add_plugin(WorldInspectorPlugin::new())
+        // .register_inspectable::<Moving>()
+        // .register_inspectable::<PlayerControllerConfiguration>()
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default())
         .add_startup_system(setup)
-        .add_startup_system(create_mine_factory)
+        // .register_inspectable::<Moving>()
+        // .register_inspectable::<PlayerControllerConfiguration>()
         .add_system(close_on_esc)
         .add_system(player_control_system)
         .add_system(movement_update_system)
         .add_system(auto_despawn_system)
         .add_system(explosion_system)
         .add_system(mine_system)
-        // .register_inspectable::<Moving>()
-        // .register_inspectable::<PlayerControllerConfiguration>()
+        .add_system(mine_laying_system)
         .run();
-}
-
-fn create_mine_factory(mut commands: Commands, assets_server: Res<AssetServer>) {
-    commands.insert_resource(MineFactory {
-        collider_radius: 3.0f32,
-        explosion_radius: 10.0f32,
-        explosion_duration: 2.0f32,
-    })
-}
-
-#[derive(Resource)]
-struct MineFactory {
-    collider_radius: f32,
-    explosion_radius: f32,
-    explosion_duration: f32,
-}
-
-impl MineFactory {
-    pub fn create_mine(self: &Self, location: Vec3) -> MineBundle {
-        todo!()
-    }
 }
 
 #[derive(Component, Default)]
