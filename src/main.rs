@@ -8,8 +8,8 @@ use bevy_rapier3d::prelude::*;
 
 // [ ] Mines
 //   [*] Lay mines using event
-//   [ ] Mines activate after fixed period
-//   [ ] Mines explode after fixed period
+//   [*] Mines activate after fixed period
+//   [*] Mines explode after fixed period
 //   [ ] Mines explode on proximity to vehicle
 // [ ] AI
 // [ ] UI
@@ -34,8 +34,8 @@ fn main() {
         .add_system(movement_update_system)
         .add_system(auto_despawn_system)
         .add_system(explosion_system)
-        .add_system(mine_system)
         .add_system(mine_laying_system)
+        .add_system(mine_lifetime_system)
         .run();
 }
 
