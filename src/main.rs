@@ -2,7 +2,7 @@ mod systems;
 use systems::*;
 
 use bevy::{prelude::*, window::close_on_esc};
-// use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 // use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
 use bevy_rapier3d::prelude::*;
 
@@ -21,7 +21,7 @@ fn main() {
     App::new()
         .add_event::<LayMineEvent>()
         .add_plugins(DefaultPlugins)
-        // .add_plugin(WorldInspectorPlugin::new())
+        .add_plugin(WorldInspectorPlugin::new())
         // .register_inspectable::<Moving>()
         // .register_inspectable::<PlayerControllerConfiguration>()
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
