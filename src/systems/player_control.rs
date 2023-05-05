@@ -15,8 +15,8 @@ pub fn player_control_system(
     )>,
     keyboard_input: Res<Input<KeyCode>>,
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
     mut lay_mine_event_writer: EventWriter<LayMineEvent>,
+    asset_server: Res<AssetServer>,
 ) {
     for (mut movement, player_controller, transform, _children) in players.iter_mut() {
         movement.velocity = 0.0;
@@ -35,7 +35,7 @@ pub fn player_control_system(
             movement.velocity -= movement.speed;
         }
         if keyboard_input.just_pressed(player_controller.keycode_fire) {
-            fire_bullet(&mut commands, transform, &mut meshes);
+            fire_bullet(&mut commands, transform, &asset_server);
         }
         if keyboard_input.just_pressed(player_controller.keycode_lay_mine) {
             lay_mine_event_writer.send(LayMineEvent::new(transform));
@@ -108,24 +108,20 @@ impl PlayerControllerConfiguration {
 //     }
 // }
 
-fn fire_bullet(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
-    const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 1.5, -3.5);
+fn fire_bullet(commands: &mut Commands, transform: &Transform, assets_server: &Res<AssetServer>) {
+    const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 5.6, -3.5);
     const BULLET_RADIUS: f32 = 0.2;
     const BULLET_LIFETIME: f32 = 1.0;
     const BULLET_VELOCITY: f32 = 20.0;
 
+    let projectile_mesh: Handle<Scene> = assets_server.load("FancyTank/projectile.glb#Scene0");
+
     let mut bullet = commands.spawn_empty();
     let entity_id = bullet.id();
     bullet.insert((
-        PbrBundle {
+        SceneBundle {
             transform: transform.with_translation(*transform * BULLET_FIRE_OFFSET),
-            mesh: meshes.add(
-                Mesh::try_from(shape::Icosphere {
-                    radius: BULLET_RADIUS,
-                    subdivisions: 3,
-                })
-                .unwrap(),
-            ),
+            scene: projectile_mesh,
             ..Default::default()
         },
         Projectile::default(),

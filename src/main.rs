@@ -50,7 +50,7 @@ fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
 
 fn spawn_camera(commands: &mut Commands) {
     commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(30.0, 30.0, 0.0)
+        transform: Transform::from_xyz(50.0, 50.0, 0.0)
             .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
         ..Default::default()
     });
@@ -64,8 +64,8 @@ fn spawn_floor(commands: &mut Commands) {
 }
 
 fn spawn_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
-    let tank_body = assets_server.load("tank/body.gltf#Scene0");
-    let tank_turret = assets_server.load("tank/turret.gltf#Scene0");
+    let tank_body = assets_server.load("FancyTank/body.glb#Scene0");
+    let tank_turret = assets_server.load("FancyTank/turret.glb#Scene0");
 
     commands
         .spawn((
