@@ -113,8 +113,8 @@ fn spawn_floor(
 }
 
 fn spawn_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
-    let tank_body = assets_server.load("FancyTank/body.glb#Scene0");
-    let tank_turret = assets_server.load("FancyTank/turret.glb#Scene0");
+    let tank_body = assets_server.load("FancyTank/body.gltf#Scene0");
+    let tank_turret = assets_server.load("FancyTank/turret.gltf#Scene0");
 
     commands
         .spawn((

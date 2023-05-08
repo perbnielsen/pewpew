@@ -114,7 +114,7 @@ fn fire_bullet(commands: &mut Commands, transform: &Transform, assets_server: &R
     const BULLET_LIFETIME: f32 = 1.0;
     const BULLET_VELOCITY: f32 = 20.0;
 
-    let projectile_mesh: Handle<Scene> = assets_server.load("FancyTank/projectile.glb#Scene0");
+    let projectile_mesh: Handle<Scene> = assets_server.load("FancyTank/projectile.gltf#Scene0");
 
     let mut bullet = commands.spawn_empty();
     let entity_id = bullet.id();
