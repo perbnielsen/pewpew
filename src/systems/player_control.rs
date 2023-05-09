@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 // use bevy_inspector_egui::egui;
-use bevy_rapier3d::prelude::*;
 
-use crate::{systems::AutoDespawn, Projectile};
-
-use super::{mine::LayMineEvent, movement_update::Moving};
+use super::{mine::LayMineEvent, movement_update::Moving, projectile::FireProjectileEvent};
 
 pub fn player_control_system(
     mut players: Query<(
@@ -14,9 +11,8 @@ pub fn player_control_system(
         &Children,
     )>,
     keyboard_input: Res<Input<KeyCode>>,
-    mut commands: Commands,
     mut lay_mine_event_writer: EventWriter<LayMineEvent>,
-    asset_server: Res<AssetServer>,
+    mut fire_projectile_event_writer: EventWriter<FireProjectileEvent>,
 ) {
     for (mut movement, player_controller, transform, _children) in players.iter_mut() {
         movement.velocity = 0.0;
@@ -35,11 +31,10 @@ pub fn player_control_system(
             movement.velocity -= movement.speed;
         }
         if keyboard_input.just_pressed(player_controller.keycode_fire) {
-            fire_bullet(&mut commands, transform, &asset_server);
+            fire_projectile_event_writer.send(FireProjectileEvent::new(transform))
         }
         if keyboard_input.just_pressed(player_controller.keycode_lay_mine) {
             lay_mine_event_writer.send(LayMineEvent::new(transform));
-            // lay_mine(&mut commands, transform, &mut meshes);
         }
     }
 }
@@ -106,49 +101,4 @@ impl PlayerControllerConfiguration {
 
 //         false // We do not modify the data
 //     }
-// }
-
-fn fire_bullet(commands: &mut Commands, transform: &Transform, assets_server: &Res<AssetServer>) {
-    const BULLET_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 5.6, -3.5);
-    const BULLET_RADIUS: f32 = 0.2;
-    const BULLET_LIFETIME: f32 = 1.0;
-    const BULLET_VELOCITY: f32 = 20.0;
-
-    let projectile_mesh: Handle<Scene> = assets_server.load("FancyTank/projectile.gltf#Scene0");
-
-    let mut bullet = commands.spawn_empty();
-    let entity_id = bullet.id();
-    bullet.insert((
-        SceneBundle {
-            transform: transform.with_translation(*transform * BULLET_FIRE_OFFSET),
-            scene: projectile_mesh,
-            ..Default::default()
-        },
-        Projectile::default(),
-        RigidBody::KinematicVelocityBased,
-        Velocity::linear(transform.forward() * BULLET_VELOCITY),
-        Collider::ball(BULLET_RADIUS),
-        AutoDespawn {
-            entity: entity_id,
-            time_to_live: BULLET_LIFETIME,
-        },
-    ));
-}
-
-// fn lay_mine(commands: &mut Commands, transform: &Transform, meshes: &mut ResMut<Assets<Mesh>>) {
-//     let mut mine = commands.spawn_empty();
-
-//     const MINE_RADIUS: f32 = 1.0;
-//     mine.insert(Collider::ball(MINE_RADIUS));
-//     mine.insert(PbrBundle {
-//         transform: *transform,
-//         mesh: meshes.add(
-//             Mesh::try_from(shape::Icosphere {
-//                 radius: MINE_RADIUS,
-//                 subdivisions: 3,
-//             })
-//             .unwrap(),
-//         ),
-//         ..Default::default()
-//     });
 // }

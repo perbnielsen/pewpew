@@ -24,14 +24,17 @@ use bevy_rapier3d::prelude::*;
 fn main() {
     App::new()
         .insert_resource(DirectionalLightShadowMap { size: 4096 })
+        .init_resource::<GameAssets>()
         .add_event::<LayMineEvent>()
+        .add_event::<FireProjectileEvent>()
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
         // .register_inspectable::<Moving>()
         // .register_inspectable::<PlayerControllerConfiguration>()
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default())
-        .add_startup_system(setup)
+        .add_startup_systems((load_game_assets, setup).chain())
+        // .add_startup_system(setup.after(load_game_assets))
         // .register_inspectable::<Moving>()
         // .register_inspectable::<PlayerControllerConfiguration>()
         .add_system(close_on_esc)
@@ -39,22 +42,20 @@ fn main() {
         .add_system(movement_update_system)
         .add_system(auto_despawn_system)
         .add_system(explosion_system)
+        .add_system(fire_projectile)
         .add_system(mine_laying_system)
         .add_system(mine_lifetime_system)
         .run();
 }
 
-#[derive(Component, Default)]
-pub struct Projectile {}
-
 fn setup(
     mut commands: Commands,
-    assets_server: Res<AssetServer>,
+    game_assets: Res<GameAssets>,
     meshes: ResMut<Assets<Mesh>>,
     materials: ResMut<Assets<StandardMaterial>>,
 ) {
     spawn_camera(&mut commands);
-    spawn_player(&mut commands, &assets_server);
+    spawn_player(&mut commands, game_assets);
     spawn_floor(&mut commands, meshes, materials);
     add_sun_light(&mut commands);
 }
@@ -112,15 +113,12 @@ fn spawn_floor(
     });
 }
 
-fn spawn_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
-    let tank_body = assets_server.load("FancyTank/body.gltf#Scene0");
-    let tank_turret = assets_server.load("FancyTank/turret.gltf#Scene0");
-
+fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
     commands
         .spawn((
             Name::new("Tank"),
             SceneBundle {
-                scene: tank_body,
+                scene: game_assets.tank_body.clone(),
                 ..Default::default()
             },
             PlayerControllerConfiguration::new(
@@ -139,7 +137,7 @@ fn spawn_player(commands: &mut Commands, assets_server: &Res<AssetServer>) {
             parent.spawn((
                 Name::new("Turret"),
                 SceneBundle {
-                    scene: tank_turret,
+                    scene: game_assets.tank_turret.clone(),
                     ..Default::default()
                 },
             ));
