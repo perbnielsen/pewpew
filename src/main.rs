@@ -1,4 +1,7 @@
 mod systems;
+
+use std::f32::consts::PI;
+
 use systems::*;
 
 use bevy::{
@@ -69,7 +72,7 @@ fn add_sun_light(commands: &mut Commands) {
         },
         transform: Transform {
             translation: Vec3::new(0.0, 2.0, 0.0),
-            rotation: Quat::from_rotation_x(-std::f32::consts::PI / 4.),
+            rotation: Quat::from_rotation_x(-PI / 4.0),
             ..default()
         },
         // The default cascade config is designed to handle large scenes.
