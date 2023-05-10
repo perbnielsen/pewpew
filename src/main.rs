@@ -24,10 +24,18 @@ use bevy_rapier3d::prelude::*;
 // [ ] Death
 // [ ] Collision detection
 
+#[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone)]
+pub enum AppState {
+    #[default]
+    Loading,
+    Game,
+}
+
 fn main() {
     App::new()
         .insert_resource(DirectionalLightShadowMap { size: 4096 })
         .init_resource::<GameAssets>()
+        .add_state::<AppState>()
         .add_event::<LayMineEvent>()
         .add_event::<FireProjectileEvent>()
         .add_plugins(DefaultPlugins)
@@ -36,22 +44,26 @@ fn main() {
         // .register_inspectable::<PlayerControllerConfiguration>()
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default())
-        .add_startup_systems((load_game_assets, setup).chain())
-        // .add_startup_system(setup.after(load_game_assets))
-        // .register_inspectable::<Moving>()
-        // .register_inspectable::<PlayerControllerConfiguration>()
-        .add_system(close_on_esc)
-        .add_system(player_control_system)
-        .add_system(movement_update_system)
-        .add_system(auto_despawn_system)
-        .add_system(explosion_system)
-        .add_system(fire_projectile)
-        .add_system(mine_laying_system)
-        .add_system(mine_lifetime_system)
+        .add_system(load_game_assets.in_schedule(OnEnter(AppState::Loading)))
+        .add_system(loading_assets.in_set(OnUpdate(AppState::Loading)))
+        .add_system(load_level.in_schedule(OnEnter(AppState::Game)))
+        .add_systems(
+            (
+                close_on_esc,
+                player_control_system,
+                movement_update_system,
+                auto_despawn_system,
+                explosion_system,
+                fire_projectile,
+                mine_laying_system,
+                mine_lifetime_system,
+            )
+                .in_set(OnUpdate(AppState::Game)),
+        )
         .run();
 }
 
-fn setup(
+fn load_level(
     mut commands: Commands,
     game_assets: Res<GameAssets>,
     meshes: ResMut<Assets<Mesh>>,
@@ -121,7 +133,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
         .spawn((
             Name::new("Tank"),
             SceneBundle {
-                scene: game_assets.tank_body.clone(),
+                scene: game_assets.get_asset(GameAssetName::TankBody),
                 ..Default::default()
             },
             PlayerControllerConfiguration::new(
@@ -140,7 +152,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
             parent.spawn((
                 Name::new("Turret"),
                 SceneBundle {
-                    scene: game_assets.tank_turret.clone(),
+                    scene: game_assets.get_asset(GameAssetName::TankTurret),
                     ..Default::default()
                 },
             ));

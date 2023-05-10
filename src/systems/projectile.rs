@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
+use crate::systems::GameAssetName;
+
 use super::{AutoDespawn, GameAssets};
 
 pub struct FireProjectileEvent {
@@ -36,7 +38,7 @@ pub fn fire_projectile(
                 transform: event
                     .transform
                     .with_translation(event.transform * PROJECTILE_FIRE_OFFSET),
-                scene: game_assets.projectile.clone(),
+                scene: game_assets.get_asset(GameAssetName::Projectile),
                 ..Default::default()
             },
             Projectile::default(),
