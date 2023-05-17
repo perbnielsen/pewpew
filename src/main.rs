@@ -87,22 +87,21 @@ fn add_sun_light(commands: &mut Commands) {
             rotation: Quat::from_rotation_x(-PI / 4.0),
             ..default()
         },
-        // The default cascade config is designed to handle large scenes.
-        // As this example has a much smaller world, we can tighten the shadow
-        // bounds for better visual quality.
         cascade_shadow_config: CascadeShadowConfigBuilder {
-            first_cascade_far_bound: 4.0,
-            maximum_distance: 100.0,
-            ..default()
+            num_cascades: 4,
+            minimum_distance: 50.0,
+            maximum_distance: 200.0,
+            first_cascade_far_bound: 75.0,
+            overlap_proportion: 0.2,
         }
-        .into(),
+        .build(),
         ..default()
     });
 }
 
 fn spawn_camera(commands: &mut Commands) {
     commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(50.0, 50.0, 0.0)
+        transform: Transform::from_xyz(75.0, 75.0, 0.0)
             .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
         ..Default::default()
     });
