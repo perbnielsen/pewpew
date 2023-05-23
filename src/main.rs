@@ -57,6 +57,7 @@ fn main() {
                 fire_projectile,
                 mine_laying_system,
                 mine_lifetime_system,
+                aim_turret,
             )
                 .in_set(OnUpdate(AppState::Game)),
         )
@@ -128,7 +129,7 @@ fn spawn_floor(
 }
 
 fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
-    commands
+    let tank = commands
         .spawn((
             Name::new("Tank"),
             SceneBundle {
@@ -147,13 +148,18 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
             RigidBody::KinematicVelocityBased,
             Velocity::default(),
         ))
-        .with_children(|parent| {
-            parent.spawn((
-                Name::new("Turret"),
-                SceneBundle {
-                    scene: game_assets.get_asset(GameAssetName::TankTurret),
-                    ..Default::default()
-                },
-            ));
-        });
+        .id();
+
+    let turret = commands
+        .spawn((
+            Name::new("Turret"),
+            Turret {},
+            SceneBundle {
+                scene: game_assets.get_asset(GameAssetName::TankTurret),
+                ..Default::default()
+            },
+        ))
+        .id();
+
+    commands.entity(turret).set_parent(tank);
 }
