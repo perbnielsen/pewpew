@@ -74,7 +74,6 @@ fn load_level(
 }
 
 fn add_sun_light(commands: &mut Commands) {
-    // directional 'sun' light
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             shadows_enabled: true,
