@@ -88,15 +88,3 @@ pub fn fire_projectile(
         ));
     }
 }
-
-// pub fn turret_fire(
-//     mut turrets: Query<(&Transform, &Turret)>,
-//     keyboard_input: Res<Input<KeyCode>>,
-//     mut fire_projectile_event_writer: EventWriter<FireProjectileEvent>,
-// ) {
-//     for (transform, turret) in turrets.iter_mut() {
-//         if keyboard_input.just_pressed(player_controller.keycode_fire) {
-//             fire_projectile_event_writer.send(FireProjectileEvent::new(transform))
-//         }
-//     }
-// }
