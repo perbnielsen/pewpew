@@ -153,7 +153,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
     let turret = commands
         .spawn((
             Name::new("Turret"),
-            Turret {},
+            Turret { tank },
             SceneBundle {
                 scene: game_assets.get_asset(GameAssetName::TankTurret),
                 ..Default::default()

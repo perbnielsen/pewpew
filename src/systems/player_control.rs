@@ -1,20 +1,20 @@
 use bevy::prelude::*;
 // use bevy_inspector_egui::egui;
 
-use super::{mine::LayMineEvent, movement_update::Moving, projectile::FireProjectileEvent};
+use super::{mine::LayMineEvent, movement_update::Moving, FireProjectileEvent};
 
 pub fn player_control_system(
     mut players: Query<(
+        Entity,
         &mut Moving,
         &PlayerControllerConfiguration,
         &Transform,
-        &Children,
     )>,
     keyboard_input: Res<Input<KeyCode>>,
     mut lay_mine_event_writer: EventWriter<LayMineEvent>,
     mut fire_projectile_event_writer: EventWriter<FireProjectileEvent>,
 ) {
-    for (mut movement, player_controller, transform, _children) in players.iter_mut() {
+    for (entity, mut movement, player_controller, transform) in players.iter_mut() {
         movement.velocity = 0.0;
         movement.delta_yaw = 0.0;
 
@@ -31,7 +31,7 @@ pub fn player_control_system(
             movement.velocity -= movement.speed;
         }
         if keyboard_input.just_pressed(player_controller.keycode_fire) {
-            fire_projectile_event_writer.send(FireProjectileEvent::new(transform))
+            fire_projectile_event_writer.send(FireProjectileEvent::new(entity))
         }
         if keyboard_input.just_pressed(player_controller.keycode_lay_mine) {
             lay_mine_event_writer.send(LayMineEvent::new(transform));
