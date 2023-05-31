@@ -110,18 +110,17 @@ fn spawn_floor(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     commands.spawn((
-        Collider::cuboid(100.0, 0.1, 100.0),
-        TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)),
-    ));
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(shape::Plane::from_size(100.0).into()),
-        material: materials.add(StandardMaterial {
-            base_color: Color::WHITE,
-            perceptual_roughness: 1.0,
+        Collider::cuboid(50.0, 1.0, 50.0),
+        PbrBundle {
+            mesh: meshes.add(shape::Plane::from_size(100.0).into()),
+            material: materials.add(StandardMaterial {
+                base_color: Color::WHITE,
+                perceptual_roughness: 1.0,
+                ..default()
+            }),
             ..default()
-        }),
-        ..default()
-    });
+        },
+    ));
 }
 
 fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
