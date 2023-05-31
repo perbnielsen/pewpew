@@ -68,7 +68,9 @@ pub fn fire_projectile(
     const PROJECTILE_VELOCITY: f32 = 30.0;
 
     for event in event_reader.iter() {
-        let Some((transform, _)) = turrets.iter().find(|(_, turret)|turret.tank == event.source) else { continue; };
+        let Some((transform, _)) = turrets.iter().find(|(_, turret)|turret.tank == event.source) else {
+             continue;
+        };
 
         commands.spawn((
             SceneBundle {
