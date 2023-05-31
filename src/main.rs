@@ -10,7 +10,6 @@ use bevy::{
     window::close_on_esc,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-// use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
 use bevy_rapier3d::prelude::*;
 
 // [ ] Mines
@@ -40,8 +39,6 @@ fn main() {
         .add_event::<FireProjectileEvent>()
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
-        // .register_inspectable::<Moving>()
-        // .register_inspectable::<PlayerControllerConfiguration>()
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default())
         .add_system(load_game_assets.in_schedule(OnEnter(AppState::Loading)))
