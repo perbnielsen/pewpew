@@ -14,14 +14,12 @@ pub enum Mine {
 }
 
 pub struct LayMineEvent {
-    transform: Transform,
+    source: Entity,
 }
 
 impl LayMineEvent {
-    pub(crate) fn new(transform: &Transform) -> Self {
-        Self {
-            transform: transform.clone(),
-        }
+    pub(crate) fn new(source: Entity) -> Self {
+        Self { source }
     }
 }
 
@@ -29,15 +27,19 @@ pub fn mine_laying_system(
     mut commands: Commands,
     mut lay_mine_event_reader: EventReader<LayMineEvent>,
     mut meshes: ResMut<Assets<Mesh>>,
+    transforms: Query<&Transform>,
     time: Res<Time>,
 ) {
     for event in lay_mine_event_reader.iter() {
         let mut mine = commands.spawn_empty();
+        let Ok(&transform) = transforms.get(event.source) else {
+            continue;
+        };
 
         mine.insert(Mine::Arming(time.elapsed() + MINE_ARMING_DELAY));
         mine.insert(Collider::ball(MINE_RADIUS));
         mine.insert(PbrBundle {
-            transform: event.transform,
+            transform: transform,
             mesh: meshes.add(
                 Mesh::try_from(shape::Icosphere {
                     radius: MINE_RADIUS,
