@@ -17,5 +17,11 @@ pub fn auto_despawn_system(
 
 #[derive(Debug, Component)]
 pub struct AutoDespawn {
-    pub time_to_live: f32,
+    time_to_live: f32,
+}
+
+impl AutoDespawn {
+    pub fn new(time_to_live: f32) -> Self {
+        Self { time_to_live }
+    }
 }

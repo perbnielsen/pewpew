@@ -84,9 +84,7 @@ pub fn fire_projectile(
             RigidBody::KinematicVelocityBased,
             Velocity::linear(transform.forward() * PROJECTILE_VELOCITY),
             Collider::ball(PROJECTILE_RADIUS),
-            AutoDespawn {
-                time_to_live: PROJECTILE_LIFETIME,
-            },
+            AutoDespawn::new(PROJECTILE_LIFETIME),
         ));
     }
 }
