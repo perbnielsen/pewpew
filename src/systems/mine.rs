@@ -13,6 +13,7 @@ pub enum Mine {
     Armed(Duration),
 }
 
+#[derive(Event)]
 pub struct LayMineEvent {
     source: Entity,
 }
@@ -39,7 +40,7 @@ pub fn mine_laying_system(
         mine.insert(Mine::Arming(time.elapsed() + MINE_ARMING_DELAY));
         mine.insert(Collider::ball(MINE_RADIUS));
         mine.insert(PbrBundle {
-            transform: transform,
+            transform,
             mesh: meshes.add(
                 Mesh::try_from(shape::Icosphere {
                     radius: MINE_RADIUS,

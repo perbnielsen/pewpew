@@ -38,13 +38,14 @@ fn main() {
         .add_event::<LayMineEvent>()
         .add_event::<FireProjectileEvent>()
         .add_plugins(DefaultPlugins)
-        .add_plugin(WorldInspectorPlugin::new())
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugin(RapierDebugRenderPlugin::default())
-        .add_system(load_game_assets.in_schedule(OnEnter(AppState::Loading)))
-        .add_system(loading_assets.in_set(OnUpdate(AppState::Loading)))
-        .add_system(load_level.in_schedule(OnEnter(AppState::Game)))
+        .add_plugins(WorldInspectorPlugin::new())
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugins(RapierDebugRenderPlugin::default())
+        .add_systems(OnEnter(AppState::Loading), load_game_assets)
+        .add_systems(Update, loading_assets.run_if(in_state(AppState::Loading)))
+        .add_systems(OnEnter(AppState::Game), load_level)
         .add_systems(
+            Update,
             (
                 close_on_esc,
                 player_control_system,
@@ -56,7 +57,7 @@ fn main() {
                 mine_lifetime_system,
                 aim_turret,
             )
-                .in_set(OnUpdate(AppState::Game)),
+                .run_if(in_state(AppState::Game)),
         )
         .run();
 }

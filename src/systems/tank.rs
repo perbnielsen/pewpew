@@ -15,6 +15,7 @@ pub struct Tank {
     pub entity: Entity,
 }
 
+#[derive(Event)]
 pub struct FireProjectileEvent {
     source: Entity,
 }
