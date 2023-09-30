@@ -134,9 +134,9 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
             },
             PlayerControllerConfiguration::new(
                 KeyCode::A,
-                KeyCode::D,
-                KeyCode::W,
                 KeyCode::S,
+                KeyCode::W,
+                KeyCode::R,
                 KeyCode::Space,
                 KeyCode::M,
             ),
