@@ -44,7 +44,7 @@ pub fn aim_turret(
 
     let window_size = Vec2::new(primary_window.width(), primary_window.height());
     let cursor_position = cursor_position - window_size / 2.0;
-    let cursor_position = Vec3::new(-cursor_position.y, 0.0, -cursor_position.x) / 10.0;
+    let cursor_position = Vec3::new(cursor_position.y, 0.0, -cursor_position.x) / 10.0;
 
     for (mut turret_transform, parent) in &mut turrets {
         if let Ok(tank_transform) = tanks.get(parent.get()) {
