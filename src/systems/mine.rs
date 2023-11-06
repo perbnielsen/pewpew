@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::*;
+use bevy_xpbd_3d::prelude::*;
 
 const MINE_RADIUS: f32 = 1.0;
 const MINE_ARMING_DELAY: Duration = Duration::from_secs(3);
@@ -31,7 +31,7 @@ pub fn mine_laying_system(
     transforms: Query<&Transform>,
     time: Res<Time>,
 ) {
-    for event in lay_mine_event_reader.iter() {
+    for event in lay_mine_event_reader.read() {
         let mut mine = commands.spawn_empty();
         let Ok(&transform) = transforms.get(event.source) else {
             continue;

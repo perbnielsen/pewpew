@@ -10,7 +10,7 @@ use bevy::{
     window::close_on_esc,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use bevy_rapier3d::prelude::*;
+use bevy_xpbd_3d::prelude::*;
 
 // [ ] Mines
 //   [*] Lay mines using event
@@ -39,8 +39,7 @@ fn main() {
         .add_event::<FireProjectileEvent>()
         .add_plugins(DefaultPlugins)
         .add_plugins(WorldInspectorPlugin::new())
-        .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugins(RapierDebugRenderPlugin::default())
+        .add_plugins(PhysicsPlugins::default())
         .add_systems(OnEnter(AppState::Loading), load_game_assets)
         .add_systems(Update, loading_assets.run_if(in_state(AppState::Loading)))
         .add_systems(OnEnter(AppState::Game), load_level)
@@ -141,8 +140,8 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
                 KeyCode::M,
             ),
             Moving::new(10.0, 3.0),
-            RigidBody::KinematicVelocityBased,
-            Velocity::default(),
+            RigidBody::Kinematic,
+            LinearVelocity::default(),
         ))
         .with_children(|parent| {
             parent.spawn((

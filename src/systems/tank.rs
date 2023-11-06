@@ -1,5 +1,5 @@
 use bevy::{prelude::*, window::PrimaryWindow};
-use bevy_rapier3d::prelude::*;
+use bevy_xpbd_3d::prelude::*;
 
 use crate::systems::{AutoDespawn, GameAssetName};
 
@@ -68,7 +68,7 @@ pub fn fire_projectile(
     const PROJECTILE_LIFETIME: f32 = 1.0;
     const PROJECTILE_VELOCITY: f32 = 30.0;
 
-    for event in event_reader.iter() {
+    for event in event_reader.read() {
         let Some((transform, _)) = turrets
             .iter()
             .find(|(_, turret)| turret.tank == event.source)
@@ -85,8 +85,8 @@ pub fn fire_projectile(
                 ..Default::default()
             },
             Projectile::default(),
-            RigidBody::KinematicVelocityBased,
-            Velocity::linear(transform.forward() * PROJECTILE_VELOCITY),
+            RigidBody::Kinematic,
+            LinearVelocity::from(transform.forward() * PROJECTILE_VELOCITY),
             Collider::ball(PROJECTILE_RADIUS),
             AutoDespawn::new(PROJECTILE_LIFETIME),
         ));

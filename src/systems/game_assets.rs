@@ -13,19 +13,13 @@ impl GameAssets {
     fn all_assets_loaded(&self, asset_server: Res<AssetServer>) -> bool {
         for asset in self.assets.values() {
             match asset_server.get_load_state(asset) {
-                LoadState::NotLoaded => todo!(),
-                LoadState::Loading => return false,
-                LoadState::Loaded => continue,
-                LoadState::Failed => panic!(
-                    "An asset {} failed to load",
-                    asset_server
-                        .get_handle_path(asset)
-                        .unwrap()
-                        .path()
-                        .to_str()
-                        .unwrap()
-                ),
-                LoadState::Unloaded => todo!(),
+                Some(LoadState::NotLoaded) => todo!(),
+                Some(LoadState::Loading) => return false,
+                Some(LoadState::Loaded) => continue,
+                Some(LoadState::Failed) => {
+                    panic!("An asset {} failed to load", asset.path().unwrap())
+                }
+                None => todo!(),
             }
         }
 

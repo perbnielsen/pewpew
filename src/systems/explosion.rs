@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::*;
+use bevy_xpbd_3d::{math::Vector, prelude::*};
 
 #[derive(Bundle)]
 pub struct ExplosionBundle {
@@ -44,15 +44,13 @@ pub fn explosion_system(
     const EXPLOSION_SIZE: f32 = 5.0;
 
     for (mut collider, explosion) in colliders.iter_mut() {
-        let radius = collider.as_ball_mut().unwrap().radius();
+        let radius = collider.shape().as_ball().unwrap().radius;
 
         if radius > EXPLOSION_SIZE {
             commands.entity(explosion.entity).despawn_recursive();
         } else {
-            collider
-                .as_ball_mut()
-                .unwrap()
-                .set_radius(radius + time.delta_seconds() * EXPLOSION_SIZE / EXPLOSION_DURATION);
+            let new_radius = radius + time.delta_seconds() * EXPLOSION_SIZE / EXPLOSION_DURATION;
+            collider.set_scale(Vector::ONE * new_radius, 0);
         }
     }
 }
