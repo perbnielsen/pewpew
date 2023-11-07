@@ -11,9 +11,7 @@ pub struct Turret {
 }
 
 #[derive(Component)]
-pub struct Tank {
-    pub entity: Entity,
-}
+pub struct Tank {}
 
 #[derive(Event)]
 pub struct FireProjectileEvent {
@@ -30,7 +28,7 @@ impl FireProjectileEvent {
 }
 
 pub fn aim_turret(
-    tanks: Query<&Transform, Without<Turret>>,
+    tanks: Query<&Transform, (With<Tank>, Without<Turret>)>,
     mut turrets: Query<(&mut Transform, &Parent), With<Turret>>,
     primary_windows: Query<&Window, With<PrimaryWindow>>,
 ) {
@@ -63,9 +61,9 @@ pub fn fire_projectile(
     mut event_reader: EventReader<FireProjectileEvent>,
     game_assets: Res<GameAssets>,
 ) {
-    const PROJECTILE_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 5.6, -3.5);
-    const PROJECTILE_RADIUS: f32 = 0.2;
-    const PROJECTILE_LIFETIME: f32 = 1.0;
+    const PROJECTILE_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 5.6, -4.5);
+    const PROJECTILE_RADIUS: f32 = 0.5;
+    const PROJECTILE_LIFETIME: f32 = 5.0;
     const PROJECTILE_VELOCITY: f32 = 30.0;
 
     for event in event_reader.read() {

@@ -76,6 +76,7 @@ fn load_level(
 fn add_sun_light(commands: &mut Commands) {
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
+            illuminance: 40000.0,
             shadows_enabled: true,
             ..default()
         },
@@ -110,9 +111,9 @@ fn spawn_floor(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     commands.spawn((
-        Collider::cuboid(50.0, 1.0, 50.0),
+        Collider::cuboid(100.0, 1.0, 100.0),
         PbrBundle {
-            mesh: meshes.add(shape::Plane::from_size(100.0).into()),
+            mesh: meshes.add(Mesh::from(shape::Plane::from_size(100.0))),
             material: materials.add(StandardMaterial {
                 base_color: Color::WHITE,
                 perceptual_roughness: 1.0,
@@ -127,6 +128,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
     let tank = commands
         .spawn((
             Name::new("Tank"),
+            Tank {},
             SceneBundle {
                 scene: game_assets.get_asset(GameAssetName::TankBody),
                 ..Default::default()
@@ -146,7 +148,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
         .with_children(|parent| {
             parent.spawn((
                 TransformBundle::from_transform(Transform::from_xyz(0.0, 3.0, 0.0)),
-                Collider::cuboid(4.0, 3.0, 4.0),
+                Collider::cylinder(6.0, 4.0),
             ));
         })
         .id();
