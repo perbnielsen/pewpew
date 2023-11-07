@@ -40,6 +40,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(PhysicsPlugins::default())
+        .add_plugins(PhysicsDebugPlugin::default())
         .add_systems(OnEnter(AppState::Loading), load_game_assets)
         .add_systems(Update, loading_assets.run_if(in_state(AppState::Loading)))
         .add_systems(OnEnter(AppState::Game), load_level)
