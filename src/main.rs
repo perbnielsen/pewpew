@@ -149,7 +149,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
         .with_children(|parent| {
             parent.spawn((
                 TransformBundle::from_transform(Transform::from_xyz(0.0, 3.0, 0.0)),
-                Collider::cylinder(6.0, 4.0),
+                Collider::capsule(2.0, 4.0),
             ));
         })
         .id();

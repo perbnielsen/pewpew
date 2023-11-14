@@ -38,7 +38,7 @@ pub fn mine_laying_system(
         };
 
         mine.insert(Mine::Arming(time.elapsed() + MINE_ARMING_DELAY));
-        mine.insert(Collider::ball(MINE_RADIUS));
+        mine.insert(Collider::capsule(10.0, MINE_RADIUS));
         mine.insert(PbrBundle {
             transform,
             mesh: meshes.add(
