@@ -28,7 +28,7 @@ impl GameAssets {
 
     pub fn get_asset(&self, asset_name: GameAssetName) -> Handle<Scene> {
         match self.assets.get(&asset_name) {
-            Some(asset) => return asset.clone(),
+            Some(asset) => asset.clone(),
             None => panic!("Asset had not been loaded"),
         }
     }
