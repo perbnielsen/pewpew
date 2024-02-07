@@ -6,7 +6,7 @@ pub fn auto_despawn_system(
     mut auto_despawners: Query<(&mut AutoDespawn, &Transform, Entity)>,
     time: Res<Time>,
 ) {
-    for (mut auto_despawner, transform, entity) in auto_despawners.iter_mut() {
+    for (mut auto_despawner, transform, entity) in &mut auto_despawners {
         auto_despawner.time_to_live -= time.delta_seconds();
         if auto_despawner.time_to_live < 0.0 {
             commands.entity(entity).despawn_recursive();

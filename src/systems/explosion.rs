@@ -43,7 +43,7 @@ pub fn explosion_system(
     const EXPLOSION_DURATION: f32 = 0.2;
     const EXPLOSION_SIZE: f32 = 5.0;
 
-    for (mut collider, explosion) in colliders.iter_mut() {
+    for (mut collider, explosion) in &mut colliders {
         let radius = collider.shape().as_ball().unwrap().radius;
 
         if radius > EXPLOSION_SIZE {

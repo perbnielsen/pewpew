@@ -4,7 +4,7 @@ pub fn movement_update_system(
     mut moving_objects: Query<(&Moving, &mut Transform)>,
     time: Res<Time>,
 ) {
-    for (movement, mut transform) in moving_objects.iter_mut() {
+    for (movement, mut transform) in &mut moving_objects {
         let forward_velocity = transform.forward() * movement.velocity * time.delta_seconds();
         transform.translation += forward_velocity;
         transform.rotation *= Quat::from_rotation_y(movement.delta_yaw * time.delta_seconds());
