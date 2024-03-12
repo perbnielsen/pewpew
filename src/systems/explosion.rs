@@ -1,5 +1,7 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
-use bevy_xpbd_3d::{math::Vector, prelude::*};
+use bevy_xpbd_3d::prelude::*;
 
 #[derive(Bundle)]
 pub struct ExplosionBundle {
@@ -11,46 +13,52 @@ pub struct ExplosionBundle {
 }
 
 impl ExplosionBundle {
-    pub fn new(translation: Vec3, entity: Entity) -> Self {
+    pub fn new(translation: Vec3, start: Duration) -> Self {
+        const EXPLOSION_DURATION: f32 = 0.5; //Duration = Duration::from_secs_f32(0.5);
+        const EXPLOSION_RADIUS: f32 = 10.0;
+
         Self {
             transform: Transform {
                 translation,
                 ..Default::default()
             },
             global_transform: GlobalTransform::default(),
-            explosion: Explosion { entity },
-            collider: Collider::ball(0.0),
+            explosion: Explosion {
+                start,
+                duration: Duration::from_secs_f32(EXPLOSION_DURATION),
+                size: EXPLOSION_RADIUS,
+            },
+            collider: Collider::from(Sphere::new(1.0)),
             name: Name::new("Explosion"),
         }
     }
 }
 
-pub fn spawn_explosion(commands: &mut Commands, translation: Vec3) {
+pub fn spawn_explosion(commands: &mut Commands, translation: Vec3, start_time: Duration) {
     let mut explosion = commands.spawn_empty();
-    explosion.insert(ExplosionBundle::new(translation, explosion.id()));
+    explosion.insert(ExplosionBundle::new(translation, start_time));
 }
 
 #[derive(Component)]
 pub struct Explosion {
-    pub entity: Entity,
+    pub start: Duration,
+    pub duration: Duration,
+    pub size: f32,
 }
 
 pub fn explosion_system(
     mut commands: Commands,
-    mut colliders: Query<(&mut Collider, &Explosion)>,
+    mut colliders: Query<(&mut Transform, Entity, &Explosion)>,
     time: Res<Time>,
 ) {
-    const EXPLOSION_DURATION: f32 = 0.2;
-    const EXPLOSION_SIZE: f32 = 5.0;
-
-    for (mut collider, explosion) in &mut colliders {
-        let radius = collider.shape().as_ball().unwrap().radius;
-
-        if radius > EXPLOSION_SIZE {
-            commands.entity(explosion.entity).despawn_recursive();
+    for (mut transform, entity, explosion) in &mut colliders {
+        let progress =
+            (time.elapsed() - explosion.start).as_secs_f32() / explosion.duration.as_secs_f32();
+        if progress >= 1.0 {
+            commands.entity(entity).despawn_recursive();
         } else {
-            let new_radius = radius + time.delta_seconds() * EXPLOSION_SIZE / EXPLOSION_DURATION;
-            collider.set_scale(Vector::ONE * new_radius, 0);
+            let radius = progress * explosion.size;
+            transform.scale = Vec3::ONE * radius;
         }
     }
 }

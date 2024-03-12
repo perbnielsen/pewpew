@@ -31,6 +31,7 @@ pub fn aim_turret(
     tanks: Query<&Transform, (With<Tank>, Without<Turret>)>,
     mut turrets: Query<(&mut Transform, &Parent), With<Turret>>,
     primary_windows: Query<&Window, With<PrimaryWindow>>,
+    // camera: Query<&Transform, With<Camera3d>>,
 ) {
     let Ok(primary_window) = primary_windows.get_single() else {
         return;
@@ -63,8 +64,8 @@ pub fn fire_projectile(
 ) {
     const PROJECTILE_FIRE_OFFSET: Vec3 = Vec3::new(0.0, 5.6, -4.5);
     const PROJECTILE_RADIUS: f32 = 0.5;
-    const PROJECTILE_LIFETIME: f32 = 5.0;
-    const PROJECTILE_VELOCITY: f32 = 30.0;
+    const PROJECTILE_LIFETIME: f32 = 1.0;
+    const PROJECTILE_VELOCITY: f32 = 15.0;
 
     for event in event_reader.read() {
         let Some((transform, _)) = turrets
@@ -85,7 +86,7 @@ pub fn fire_projectile(
             Projectile::default(),
             RigidBody::Kinematic,
             LinearVelocity::from(transform.forward() * PROJECTILE_VELOCITY),
-            Collider::ball(PROJECTILE_RADIUS),
+            Collider::sphere(PROJECTILE_RADIUS),
             AutoDespawn::new(PROJECTILE_LIFETIME),
         ));
     }
