@@ -10,7 +10,7 @@ pub fn auto_despawn_system(
         auto_despawner.time_to_live -= time.delta_seconds();
         if auto_despawner.time_to_live < 0.0 {
             commands.entity(entity).despawn_recursive();
-            spawn_explosion(&mut commands, transform.translation);
+            spawn_explosion(&mut commands, transform.translation, time.elapsed());
         }
     }
 }

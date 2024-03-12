@@ -4,8 +4,8 @@ use super::{mine::LayMineEvent, movement_update::Moving, FireProjectileEvent};
 
 pub fn player_control_system(
     mut players: Query<(Entity, &mut Moving, &PlayerControllerConfiguration)>,
-    keyboard_input: Res<Input<KeyCode>>,
-    mouse_buttons: Res<Input<MouseButton>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mouse_buttons: Res<ButtonInput<MouseButton>>,
     mut lay_mine_event_writer: EventWriter<LayMineEvent>,
     mut fire_projectile_event_writer: EventWriter<FireProjectileEvent>,
 ) {
@@ -28,7 +28,7 @@ pub fn player_control_system(
         if keyboard_input.just_pressed(player_controller.keycode_fire)
             || mouse_buttons.just_pressed(MouseButton::Left)
         {
-            fire_projectile_event_writer.send(FireProjectileEvent::new(entity))
+            fire_projectile_event_writer.send(FireProjectileEvent::new(entity));
         }
         if keyboard_input.just_pressed(player_controller.keycode_lay_mine) {
             lay_mine_event_writer.send(LayMineEvent::new(entity));

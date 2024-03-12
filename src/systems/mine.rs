@@ -5,7 +5,7 @@ use bevy_xpbd_3d::prelude::*;
 
 const MINE_RADIUS: f32 = 1.0;
 const MINE_ARMING_DELAY: Duration = Duration::from_secs(3);
-const MINE_DEPLETION_DELAY: Duration = Duration::from_secs(5);
+const MINE_DEPLETION_DELAY: Duration = Duration::from_secs(20);
 
 #[derive(PartialEq, Component)]
 pub enum Mine {
@@ -41,13 +41,7 @@ pub fn mine_laying_system(
         mine.insert(Collider::capsule(10.0, MINE_RADIUS));
         mine.insert(PbrBundle {
             transform,
-            mesh: meshes.add(
-                Mesh::try_from(shape::Icosphere {
-                    radius: MINE_RADIUS,
-                    subdivisions: 3,
-                })
-                .unwrap(),
-            ),
+            mesh: meshes.add(Sphere::new(MINE_RADIUS)),
             ..Default::default()
         });
     }
@@ -58,7 +52,7 @@ pub fn mine_lifetime_system(
     mut mines: Query<(Entity, &mut Mine)>,
     time: Res<Time>,
 ) {
-    for (entity, mine) in mines.iter_mut() {
+    for (entity, mine) in &mut mines {
         match *mine {
             Mine::Arming(arming_time) => {
                 if time.elapsed() > arming_time {

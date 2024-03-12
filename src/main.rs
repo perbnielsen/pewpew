@@ -13,13 +13,17 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_xpbd_3d::prelude::*;
 
 // [ ] Mines
-//   [*] Lay mines using event
-//   [*] Mines activate after fixed period
-//   [*] Mines explode after fixed period
-//   [ ] Mines explode on proximity to vehicle
+//     [*] Lay mines using event
+//     [*] Mines activate after fixed period
+//     [*] Mines explode after fixed period
+//     [ ] Mines explode when shot
+//     [ ] Mines explode on proximity to vehicle
 // [ ] AI
 // [ ] UI
-// [ ] Level loading
+// [ ] Level creation
+//     [ ] Level loading
+//     [ ] Level saving
+//     [ ] Level editing
 // [ ] Death
 // [ ] Collision detection
 
@@ -34,7 +38,7 @@ fn main() {
     App::new()
         .insert_resource(DirectionalLightShadowMap { size: 4096 })
         .init_resource::<GameAssets>()
-        .add_state::<AppState>()
+        .init_state::<AppState>()
         .add_event::<LayMineEvent>()
         .add_event::<FireProjectileEvent>()
         .add_plugins(DefaultPlugins)
@@ -59,6 +63,7 @@ fn main() {
             )
                 .run_if(in_state(AppState::Game)),
         )
+        .add_systems(Update, print_collisions)
         .run();
 }
 
@@ -98,6 +103,15 @@ fn add_sun_light(commands: &mut Commands) {
     });
 }
 
+fn print_collisions(mut collision_event_reader: EventReader<Collision>) {
+    for Collision(contacts) in collision_event_reader.read() {
+        println!(
+            "Entities {:?} and {:?} are colliding",
+            contacts.entity1, contacts.entity2,
+        );
+    }
+}
+
 fn spawn_camera(commands: &mut Commands) {
     commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(75.0, 75.0, 0.0)
@@ -106,15 +120,21 @@ fn spawn_camera(commands: &mut Commands) {
     });
 }
 
+#[derive(PhysicsLayer)]
+pub enum CollisionLayer {
+    MouseCollisionLayer,
+}
+
 fn spawn_floor(
     commands: &mut Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn((
+    let _spawn = commands.spawn((
         Collider::cuboid(100.0, 1.0, 100.0),
+        CollisionLayers::new([CollisionLayer::MouseCollisionLayer], 0),
         PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Plane::from_size(100.0))),
+            mesh: meshes.add(Plane3d::default().mesh().size(100.0, 100.0)),
             material: materials.add(StandardMaterial {
                 base_color: Color::WHITE,
                 perceptual_roughness: 1.0,
@@ -135,12 +155,12 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
                 ..Default::default()
             },
             PlayerControllerConfiguration::new(
-                KeyCode::A,
-                KeyCode::S,
-                KeyCode::W,
-                KeyCode::R,
+                KeyCode::KeyA,
+                KeyCode::KeyS,
+                KeyCode::KeyW,
+                KeyCode::KeyR,
                 KeyCode::Space,
-                KeyCode::M,
+                KeyCode::KeyM,
             ),
             Moving::new(10.0, 3.0),
             RigidBody::Kinematic,
