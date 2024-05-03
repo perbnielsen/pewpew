@@ -26,6 +26,7 @@ use bevy_xpbd_3d::prelude::*;
 //     [ ] Level editing
 // [ ] Death
 // [ ] Collision detection
+// [ ] Get rid of auto_despawn
 
 #[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone)]
 pub enum AppState {
@@ -156,9 +157,9 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
             },
             PlayerControllerConfiguration::new(
                 KeyCode::KeyA,
-                KeyCode::KeyS,
+                KeyCode::KeyD,
                 KeyCode::KeyW,
-                KeyCode::KeyR,
+                KeyCode::KeyS,
                 KeyCode::Space,
                 KeyCode::KeyM,
             ),

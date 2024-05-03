@@ -1,6 +1,10 @@
 use super::spawn_explosion;
 use bevy::prelude::*;
 
+// TODO: This system does not make sense.
+//       It should be merged into the functionality of the mine, as they are the only ones that should have a time out.
+//       Also, it seems difficult to make this generic enough to be useful
+
 pub fn auto_despawn_system(
     mut commands: Commands,
     mut auto_despawners: Query<(&mut AutoDespawn, &Transform, Entity)>,
