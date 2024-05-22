@@ -83,7 +83,7 @@ fn load_level(
 fn add_sun_light(commands: &mut Commands) {
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
-            illuminance: 40000.0,
+            illuminance: 10000.0,
             shadows_enabled: true,
             ..default()
         },
