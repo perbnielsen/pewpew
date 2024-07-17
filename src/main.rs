@@ -117,7 +117,7 @@ fn spawn_camera(commands: &mut Commands) {
     commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(75.0, 75.0, 0.0)
             .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
-        ..Default::default()
+        ..default()
     });
 }
 
@@ -153,7 +153,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
             Tank {},
             SceneBundle {
                 scene: game_assets.get_asset(GameAssetName::TankBody),
-                ..Default::default()
+                ..default()
             },
             PlayerControllerConfiguration::new(
                 KeyCode::KeyA,
@@ -181,7 +181,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
             Turret { tank },
             SceneBundle {
                 scene: game_assets.get_asset(GameAssetName::TankTurret),
-                ..Default::default()
+                ..default()
             },
         ))
         .id();

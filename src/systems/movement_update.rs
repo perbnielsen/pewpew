@@ -25,7 +25,7 @@ impl Moving {
         Self {
             speed,
             rotation_speed,
-            ..Default::default()
+            ..default()
         }
     }
 }

@@ -20,7 +20,7 @@ impl ExplosionBundle {
         Self {
             transform: Transform {
                 translation,
-                ..Default::default()
+                ..default()
             },
             global_transform: GlobalTransform::default(),
             explosion: Explosion {

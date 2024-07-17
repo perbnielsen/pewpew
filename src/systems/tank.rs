@@ -81,7 +81,7 @@ pub fn fire_projectile(
                     .compute_transform()
                     .with_translation(transform.transform_point(PROJECTILE_FIRE_OFFSET)),
                 scene: game_assets.get_asset(GameAssetName::Projectile),
-                ..Default::default()
+                ..default()
             },
             Projectile::default(),
             RigidBody::Kinematic,
