@@ -11,3 +11,7 @@ bevy = { version = "0.*", features = ["bevy_scene", "bevy_asset"] }
 bevy-inspector-egui = "0.*"
 bevy_math = "0.13.0"
 bevy_xpbd_3d = "0.*"
+
+# Consider using:
+#   bevy_asset_loader
+#   iyes-perf-ui
