@@ -16,8 +16,12 @@ impl GameAssets {
                 Some(LoadState::NotLoaded) => todo!(),
                 Some(LoadState::Loading) => return false,
                 Some(LoadState::Loaded) => continue,
-                Some(LoadState::Failed) => {
-                    panic!("An asset {} failed to load", asset.path().unwrap())
+                Some(LoadState::Failed(error)) => {
+                    panic!(
+                        "An asset {} failed to load: {}",
+                        asset.path().unwrap(),
+                        error
+                    )
                 }
                 None => todo!(),
             }
@@ -44,10 +48,13 @@ pub enum GameAssetName {
 pub fn loading_assets(
     game_assets: Res<GameAssets>,
     asset_server: Res<AssetServer>,
-    mut state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
 ) {
     if game_assets.all_assets_loaded(asset_server) {
-        state.set(AppState::Game);
+        println!("Done Loading Assets...",);
+        next_state.set(AppState::Game);
+    } else {
+        println!("Loading Assets... ");
     }
 }
 

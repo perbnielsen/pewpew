@@ -7,7 +7,6 @@ use systems::*;
 use bevy::{
     pbr::{CascadeShadowConfigBuilder, DirectionalLightShadowMap},
     prelude::*,
-    window::close_on_esc,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_xpbd_3d::prelude::*;
@@ -29,7 +28,7 @@ use bevy_xpbd_3d::prelude::*;
 // [ ] Get rid of auto_despawn
 
 #[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone)]
-pub enum AppState {
+enum AppState {
     #[default]
     Loading,
     Game,
@@ -37,22 +36,21 @@ pub enum AppState {
 
 fn main() {
     App::new()
-        .insert_resource(DirectionalLightShadowMap { size: 4096 })
-        .init_resource::<GameAssets>()
-        .init_state::<AppState>()
-        .add_event::<LayMineEvent>()
-        .add_event::<FireProjectileEvent>()
         .add_plugins(DefaultPlugins)
         .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(PhysicsPlugins::default())
         .add_plugins(PhysicsDebugPlugin::default())
+        .init_state::<AppState>()
+        .insert_resource(DirectionalLightShadowMap { size: 4096 })
+        .init_resource::<GameAssets>()
+        .add_event::<LayMineEvent>()
+        .add_event::<FireProjectileEvent>()
         .add_systems(OnEnter(AppState::Loading), load_game_assets)
         .add_systems(Update, loading_assets.run_if(in_state(AppState::Loading)))
         .add_systems(OnEnter(AppState::Game), load_level)
         .add_systems(
             Update,
             (
-                close_on_esc,
                 player_control_system,
                 movement_update_system,
                 auto_despawn_system,
