@@ -1,7 +1,7 @@
 use std::time::Duration;
 
+use avian3d::prelude::*;
 use bevy::prelude::*;
-use bevy_xpbd_3d::prelude::*;
 
 #[derive(Bundle)]
 pub struct ExplosionBundle {
@@ -55,7 +55,7 @@ pub fn explosion_system(
         let progress =
             (time.elapsed() - explosion.start).as_secs_f32() / explosion.duration.as_secs_f32();
         if progress >= 1.0 {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         } else {
             let radius = progress * explosion.size;
             transform.scale = Vec3::ONE * radius;

@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_xpbd_3d::prelude::*;
+use avian3d::prelude::*;
 
 const MINE_RADIUS: f32 = 1.0;
 const MINE_ARMING_DELAY: Duration = Duration::from_secs(3);
@@ -28,6 +28,7 @@ pub fn mine_laying_system(
     mut commands: Commands,
     mut lay_mine_event_reader: EventReader<LayMineEvent>,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
     transforms: Query<&Transform>,
     time: Res<Time>,
 ) {
@@ -39,11 +40,9 @@ pub fn mine_laying_system(
 
         mine.insert(Mine::Arming(time.elapsed() + MINE_ARMING_DELAY));
         mine.insert(Collider::capsule(10.0, MINE_RADIUS));
-        mine.insert(PbrBundle {
-            transform,
-            mesh: meshes.add(Sphere::new(MINE_RADIUS)),
-            ..Default::default()
-        });
+        mine.insert(transform);
+        mine.insert(Mesh3d(meshes.add(Sphere::new(MINE_RADIUS))));
+        mine.insert(MeshMaterial3d(materials.add(StandardMaterial::default())));
     }
 }
 

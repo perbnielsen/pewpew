@@ -11,9 +11,9 @@ pub fn auto_despawn_system(
     time: Res<Time>,
 ) {
     for (mut auto_despawner, transform, entity) in &mut auto_despawners {
-        auto_despawner.time_to_live -= time.delta_seconds();
+        auto_despawner.time_to_live -= time.delta_secs();
         if auto_despawner.time_to_live < 0.0 {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
             spawn_explosion(&mut commands, transform.translation, time.elapsed());
         }
     }

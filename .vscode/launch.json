@@ -23,7 +23,7 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "CARGO_MANIFEST_DIR": "${workspaceFolder}",
-                "RUST_LOG": "warn,bevy_xpbd_3d=trace"
+                "RUST_LOG": "warn,avian3d=trace"
             }
         },
         {

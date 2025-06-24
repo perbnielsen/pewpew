@@ -4,12 +4,12 @@ use std::f32::consts::PI;
 
 use systems::*;
 
+use avian3d::prelude::*;
 use bevy::{
     pbr::{CascadeShadowConfigBuilder, DirectionalLightShadowMap},
     prelude::*,
 };
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use bevy_xpbd_3d::prelude::*;
+use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
 // [ ] Mines
 //     [*] Lay mines using event
@@ -37,9 +37,12 @@ enum AppState {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(WorldInspectorPlugin::new())
+        .add_plugins(EguiPlugin {
+            enable_multipass_for_primary_context: false,
+        })
         .add_plugins(PhysicsPlugins::default())
         .add_plugins(PhysicsDebugPlugin::default())
+        .add_plugins(WorldInspectorPlugin::new())
         .init_state::<AppState>()
         .insert_resource(DirectionalLightShadowMap { size: 4096 })
         .init_resource::<GameAssets>()
@@ -79,18 +82,18 @@ fn load_level(
 }
 
 fn add_sun_light(commands: &mut Commands) {
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
+    commands.spawn((
+        DirectionalLight {
             illuminance: 10000.0,
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform {
+        Transform {
             translation: Vec3::new(0.0, 2.0, 0.0),
             rotation: Quat::from_rotation_x(-PI / 4.0),
             ..default()
         },
-        cascade_shadow_config: CascadeShadowConfigBuilder {
+        CascadeShadowConfigBuilder {
             num_cascades: 4,
             minimum_distance: 50.0,
             maximum_distance: 200.0,
@@ -98,29 +101,28 @@ fn add_sun_light(commands: &mut Commands) {
             overlap_proportion: 0.2,
         }
         .build(),
-        ..default()
-    });
+    ));
 }
 
-fn print_collisions(mut collision_event_reader: EventReader<Collision>) {
-    for Collision(contacts) in collision_event_reader.read() {
+fn print_collisions(mut collision_event_reader: EventReader<CollisionStarted>) {
+    for collision in collision_event_reader.read() {
         println!(
             "Entities {:?} and {:?} are colliding",
-            contacts.entity1, contacts.entity2,
+            collision.0, collision.1,
         );
     }
 }
 
 fn spawn_camera(commands: &mut Commands) {
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(75.0, 75.0, 0.0)
-            .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
-        ..default()
-    });
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(75.0, 75.0, 0.0).looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
+    ));
 }
 
-#[derive(PhysicsLayer)]
-pub enum CollisionLayer {
+#[derive(PhysicsLayer, Default)]
+pub enum GameLayer {
+    #[default]
     MouseCollisionLayer,
 }
 
@@ -131,16 +133,17 @@ fn spawn_floor(
 ) {
     let _spawn = commands.spawn((
         Collider::cuboid(100.0, 1.0, 100.0),
-        CollisionLayers::new([CollisionLayer::MouseCollisionLayer], 0),
-        PbrBundle {
-            mesh: meshes.add(Plane3d::default().mesh().size(100.0, 100.0)),
-            material: materials.add(StandardMaterial {
-                base_color: Color::WHITE,
-                perceptual_roughness: 1.0,
-                ..default()
-            }),
+        CollisionLayers::new(
+            [GameLayer::MouseCollisionLayer],
+            [GameLayer::MouseCollisionLayer; 0],
+        ),
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(100.0, 100.0))),
+        MeshMaterial3d(materials.add(StandardMaterial {
+            base_color: Color::WHITE,
+            perceptual_roughness: 1.0,
             ..default()
-        },
+        })),
+        Transform::default(),
     ));
 }
 
@@ -149,10 +152,8 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
         .spawn((
             Name::new("Tank"),
             Tank {},
-            SceneBundle {
-                scene: game_assets.get_asset(GameAssetName::TankBody),
-                ..default()
-            },
+            SceneRoot(game_assets.get_asset(GameAssetName::TankBody)),
+            Transform::default(),
             PlayerControllerConfiguration::new(
                 KeyCode::KeyA,
                 KeyCode::KeyD,
@@ -167,7 +168,7 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
         ))
         .with_children(|parent| {
             parent.spawn((
-                TransformBundle::from_transform(Transform::from_xyz(0.0, 3.0, 0.0)),
+                Transform::from_xyz(0.0, 3.0, 0.0),
                 Collider::capsule(2.0, 4.0),
             ));
         })
@@ -177,12 +178,10 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
         .spawn((
             Name::new("Turret"),
             Turret { tank },
-            SceneBundle {
-                scene: game_assets.get_asset(GameAssetName::TankTurret),
-                ..default()
-            },
+            SceneRoot(game_assets.get_asset(GameAssetName::TankTurret)),
+            Transform::default(),
         ))
         .id();
 
-    commands.entity(turret).set_parent(tank);
+    commands.entity(turret).insert(ChildOf(tank));
 }

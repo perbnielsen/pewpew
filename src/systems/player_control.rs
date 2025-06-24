@@ -28,10 +28,10 @@ pub fn player_control_system(
         if keyboard_input.just_pressed(player_controller.keycode_fire)
             || mouse_buttons.just_pressed(MouseButton::Left)
         {
-            fire_projectile_event_writer.send(FireProjectileEvent::new(entity));
+            fire_projectile_event_writer.write(FireProjectileEvent::new(entity));
         }
         if keyboard_input.just_pressed(player_controller.keycode_lay_mine) {
-            lay_mine_event_writer.send(LayMineEvent::new(entity));
+            lay_mine_event_writer.write(LayMineEvent::new(entity));
         }
     }
 }
