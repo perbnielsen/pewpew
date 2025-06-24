@@ -11,6 +11,9 @@ use bevy::{
 };
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
+#[derive(Component)]
+struct RedTank;
+
 // [ ] Mines
 //     [*] Lay mines using event
 //     [*] Mines activate after fixed period
@@ -65,7 +68,7 @@ fn main() {
             )
                 .run_if(in_state(AppState::Game)),
         )
-        .add_systems(Update, print_collisions)
+        .add_systems(Update, (print_collisions, apply_red_tank_color))
         .run();
 }
 
@@ -76,7 +79,8 @@ fn load_level(
     materials: ResMut<Assets<StandardMaterial>>,
 ) {
     spawn_camera(&mut commands);
-    spawn_player(&mut commands, game_assets);
+    spawn_player(&mut commands, &game_assets);
+    spawn_second_player(&mut commands, &game_assets);
     spawn_floor(&mut commands, meshes, materials);
     add_sun_light(&mut commands);
 }
@@ -116,7 +120,7 @@ fn print_collisions(mut collision_event_reader: EventReader<CollisionStarted>) {
 fn spawn_camera(commands: &mut Commands) {
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(75.0, 75.0, 0.0).looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
+        Transform::from_xyz(50.0, 100.0, 50.0).looking_at(Vec3::new(10.0, 0.0, 10.0), Vec3::Y),
     ));
 }
 
@@ -147,7 +151,7 @@ fn spawn_floor(
     ));
 }
 
-fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
+fn spawn_player(commands: &mut Commands, game_assets: &Res<GameAssets>) {
     let tank = commands
         .spawn((
             Name::new("Tank"),
@@ -184,4 +188,91 @@ fn spawn_player(commands: &mut Commands, game_assets: Res<GameAssets>) {
         .id();
 
     commands.entity(turret).insert(ChildOf(tank));
+}
+
+fn spawn_second_player(commands: &mut Commands, game_assets: &Res<GameAssets>) {
+    let tank = commands
+        .spawn((
+            Name::new("Tank 2"),
+            Tank {},
+            RedTank,
+            SceneRoot(game_assets.get_asset(GameAssetName::TankBody)),
+            Transform::from_xyz(20.0, 0.0, 20.0), // Different starting position
+            Moving::new(10.0, 3.0),
+            RigidBody::Kinematic,
+            LinearVelocity::default(),
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                Transform::from_xyz(0.0, 3.0, 0.0),
+                Collider::capsule(2.0, 4.0),
+            ));
+        })
+        .id();
+
+    let turret = commands
+        .spawn((
+            Name::new("Turret 2"),
+            Turret { tank },
+            RedTank,
+            SceneRoot(game_assets.get_asset(GameAssetName::TankTurret)),
+            Transform::default(),
+        ))
+        .id();
+
+    commands.entity(turret).insert(ChildOf(tank));
+}
+
+fn apply_red_tank_color(
+    red_tank_roots: Query<Entity, With<RedTank>>,
+    children: Query<&Children>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    material_handles: Query<&MeshMaterial3d<StandardMaterial>>,
+    mut commands: Commands,
+) {
+    for red_tank_root in &red_tank_roots {
+        // Apply red color to the root entity if it has a material
+        if material_handles.get(red_tank_root).is_ok() {
+            let red_material = materials.add(StandardMaterial {
+                base_color: Color::srgb(0.8, 0.2, 0.2),
+                ..default()
+            });
+            commands
+                .entity(red_tank_root)
+                .insert(MeshMaterial3d(red_material));
+        }
+
+        // Recursively apply red color to all children
+        apply_red_to_children(
+            red_tank_root,
+            &children,
+            &mut materials,
+            &material_handles,
+            &mut commands,
+        );
+    }
+}
+
+fn apply_red_to_children(
+    entity: Entity,
+    children: &Query<&Children>,
+    materials: &mut Assets<StandardMaterial>,
+    material_handles: &Query<&MeshMaterial3d<StandardMaterial>>,
+    commands: &mut Commands,
+) {
+    if let Ok(children_entities) = children.get(entity) {
+        for child in children_entities.iter() {
+            // Apply red color to this child if it has a material
+            if material_handles.get(child).is_ok() {
+                let red_material = materials.add(StandardMaterial {
+                    base_color: Color::srgb(0.8, 0.2, 0.2),
+                    ..default()
+                });
+                commands.entity(child).insert(MeshMaterial3d(red_material));
+            }
+
+            // Recursively apply to grandchildren
+            apply_red_to_children(child, children, materials, material_handles, commands);
+        }
+    }
 }

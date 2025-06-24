@@ -28,7 +28,14 @@ impl FireProjectileEvent {
 }
 
 pub fn aim_turret(
-    tanks: Query<&GlobalTransform, (With<Tank>, Without<Turret>)>,
+    tanks: Query<
+        &GlobalTransform,
+        (
+            With<Tank>,
+            With<super::PlayerControllerConfiguration>,
+            Without<Turret>,
+        ),
+    >,
     mut turrets: Query<(&mut Transform, &Turret), With<Turret>>,
     primary_windows: Query<&Window, With<PrimaryWindow>>,
     cameras: Query<(&Camera, &GlobalTransform), With<Camera3d>>,
